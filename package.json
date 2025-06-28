@@ -1,0 +1,29 @@
+{
+  "name": "momo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "node_modules/expo-router/entry",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juuuuuuuuno/MOMO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Juuuuuuuuno/MOMO/issues"
+  },
+  "homepage": "https://github.com/Juuuuuuuuno/MOMO#readme",
+  "dependencies": {
+    "expo": "^53.0.13",
+    "expo-router": "^5.1.1",
+    "expo-status-bar": "~2.2.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-native": "^0.73.6",
+    "react-native-web": "^0.20.0"
+  }
+}
