@@ -27,5 +27,24 @@ export default StyleSheet.create({
     marginTop: 20,
     textDecorationLine: 'underline',
     fontSize: 15,
+    },// Intro.js에 사용
+    subtitle2: {
+    fontSize: 15,
+    color: '#FFB6B6',
+    marginBottom: 30,
+    },// Login.js의 서브 타이틀
+    signupButton: {
+        width: '100%',
+        paddingVertical: 14,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#FF8A8A',
+        alignItems: 'center',
+        marginTop: 10,
     },
+    signupTextStrong: {
+        color: '#FF8A8A',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }, //Login.js의 회원가입 버튼
 });

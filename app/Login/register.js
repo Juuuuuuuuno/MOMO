@@ -1,13 +1,16 @@
+// app/Login/register.js
 import React, { useState } from 'react';
 import { View, Text, SafeAreaView } from 'react-native';
+import { useRouter } from 'expo-router'; // ✅ router 추가
 import BackButton from '../Components/Button/BackButton';
-import InputField from '../Components/InputField';
+import InputField from '../Components/InputField/InputField';
 import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle';
 
 export default function Register() {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
+    const router = useRouter(); // ✅ useRouter 사용
 
     const isValid = name.trim() !== '' && /^\d{10,11}$/.test(phone);
 
@@ -30,7 +33,7 @@ export default function Register() {
                 <FullWidthButton
                     label="다음"
                     disabled={!isValid}
-                    onPress={() => console.log('다음 단계')}
+                    onPress={() => router.push('/Login/registerauth')} // ✅ 페이지 이동
                 />
             </View>
         </SafeAreaView>

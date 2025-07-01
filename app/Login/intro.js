@@ -1,3 +1,4 @@
+// app/Login/login.js
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router'; // 화면 이동을 위해 추가
@@ -8,7 +9,8 @@ const Intro = () => {
   const router = useRouter(); // 라우터 인스턴스
 
     const handleStart = () => {
-    // 시작하기 버튼 동작 (필요 시 메인 화면 이동 등)
+    //router.push('/Login/login')
+    router.push('MainPage/main')
     };
 
     const handleSignup = () => {
@@ -17,7 +19,7 @@ const Intro = () => {
 
     return (
     <View style={styles.container}>
-        <Text style={styles.emoji}>🍑</Text>
+        <Text style={[styles.emoji, {marginTop : 3 }]}>🍑</Text>
 
         <Text style={styles.title}>MOMO</Text>
         <Text style={styles.subtitle}>농부의 손에서 당신의 집까지, 모모</Text>
@@ -25,7 +27,7 @@ const Intro = () => {
         <MainButton title="시작하기" onPress={handleStart} />
 
         <TouchableOpacity onPress={handleSignup}>
-        <Text style={styles.signupText}>회원가입</Text>
+          <Text style={styles.signupText}>회원가입</Text>
         </TouchableOpacity>
     </View>
     );
