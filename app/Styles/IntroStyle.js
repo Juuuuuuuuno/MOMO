@@ -15,11 +15,11 @@ export default StyleSheet.create({
     title: {
     fontSize: 80,
     fontWeight: 'bold',
-    color: '#FFB6B6',
+    color: '#FF8A8A',
     },
     subtitle: {
     fontSize: 15,
-    color: '#FFB6B6',
+    color: '#FF8A8A',
     marginBottom: 150,
     },
     signupText: {
@@ -30,7 +30,7 @@ export default StyleSheet.create({
     },// Intro.js에 사용
     subtitle2: {
     fontSize: 15,
-    color: '#FFB6B6',
+    color: '#FF8A8A',
     marginBottom: 30,
     },// Login.js의 서브 타이틀
     signupButton: {

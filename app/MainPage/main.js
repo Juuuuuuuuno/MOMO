@@ -18,7 +18,11 @@ export default function MainPage() {
             {/* 주문하기 버튼 */}
             <FullWidthButton
             label="주문하기"
-            onPress={() => console.log('주문하기')}
+            onPress={() => {
+                console.log('주문하기')
+                router.push('/order')
+                    }
+                }
             />
         </ScrollView>
         </SafeAreaView>
