@@ -9,7 +9,7 @@ const ColoredFullWidthButton = ({ label, onPress, disabled, backgroundColor }) =
         disabled={disabled}
         style={[
             styles.button,
-            { backgroundColor: backgroundColor || '#FF8A8A' }, // 기본 초록색
+            { backgroundColor: backgroundColor || '#FF8A8A' },
             disabled && styles.disabled,
         ]}
         >

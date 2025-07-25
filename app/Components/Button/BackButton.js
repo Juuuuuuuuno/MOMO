@@ -17,7 +17,8 @@ const styles = StyleSheet.create({
     backButton: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginBottom:15
+    //alignItems:'center',
+    //justifyContent:'center'
     },
     arrow: {
     fontSize: 30,

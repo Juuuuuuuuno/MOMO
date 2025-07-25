@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 30,
-        marginTop:10,
+        alignItems:'center',
+        justifyContent:'center'
     },
     imageBox: {
         borderWidth: 1,
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    padding:16,
     },
     leftBox: {
     width: 40, // BackButton 너비에 맞게

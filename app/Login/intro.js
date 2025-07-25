@@ -10,7 +10,7 @@ const Intro = () => {
 
     const handleStart = () => {
     //router.push('/Login/login')
-    router.push('admin/main')
+    router.push('MainPage/main')
     };
 
     const handleSignup = () => {

@@ -18,10 +18,11 @@ export default function Login() {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <View style={{ flex: 1, paddingHorizontal: 30 }}>
 
+
         {/* 뒤로가기 버튼 */}
-        <View style={{ marginTop: 10 }}>
+        {/* <View style={{ marginTop: 10 }}>
             <BackButton />
-        </View>
+        </View> */}
 
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           {/* 로고 */}

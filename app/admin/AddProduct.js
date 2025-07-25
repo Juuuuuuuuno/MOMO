@@ -110,31 +110,28 @@ export default function AddProduct() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-                <KeyboardAvoidingView
+            <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
-                >
-                <ScrollView contentContainerStyle={styles.container}>
-                    
-                    <View style={styles.headerRow}>
+            >
+                {/* ✅ 헤더: ScrollView 바깥으로 이동 */}
+                <View style={styles.headerRow}>
                     <View style={styles.leftBox}>
                         <BackButton onPress={() => router.back()} />
                     </View>
-
                     <View style={styles.centerBox}>
                         <Text style={styles.title}>상품 추가</Text>
                     </View>
-
                     <View style={styles.rightBox} />
-                    </View>
+                </View>
 
+                {/* ✅ 스크롤되는 영역 */}
+                <ScrollView contentContainerStyle={styles.container}>
                     {/* 사진 추가 박스 */}
                     <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
                         {image ? (
-                            // ✅ 선택된 이미지 표시
                             <Image source={{ uri: image }} style={styles.selectedImage} />
                         ) : (
-                            // 📸 기본 카메라 아이콘 + 텍스트 표시
                             <>
                                 <Image source={require('../../assets/camera.png')} style={styles.cameraIcon} />
                                 <Text style={styles.imageText}>사진 추가</Text>
@@ -150,7 +147,7 @@ export default function AddProduct() {
                             value={productName}
                             onChangeText={setProductName}
                         />
-                        <Text style={styles.exampleText}>예시: 정품 백도 4.5kg</Text>
+                        <Text style={styles.exampleText}>예시: 정품 백도 4.5kg 12과</Text>
                     </View>
 
                     {/* 가격 입력 */}
@@ -165,15 +162,16 @@ export default function AddProduct() {
                         <Text style={styles.exampleText}>배송비를 제외한 가격을 적어 주세요.</Text>
                     </View>
 
-                    {/* 작성 완료 버튼 */}
-                        <ColoredFullWidthButton
+                    {/* 버튼 */}
+                    <ColoredFullWidthButton
                         label="추가하기"
                         onPress={handleSubmit}
                         disabled={!isFormValid}
-                        backgroundColor={isFormValid ? '#FF8A8A' : '#888'} // ✅ 조건부 색상
+                        backgroundColor={isFormValid ? '#FF8A8A' : '#888'}
                     />
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
+
 }
