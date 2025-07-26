@@ -22,9 +22,12 @@ export default function ProductDetail() {
     return (quantity * weightPerUnit) >= 20;
     };
 
-    const deliveryFee = getDeliveryFee(quantity);
-    const totalPrice = quantity * price + deliveryFee;
-    const overweight = isOverWeight(quantity);
+    const parsedPrice = Number(price);
+    const parsedQuantity = Number(quantity);
+    const deliveryFee = getDeliveryFee(parsedQuantity);
+    const totalPrice = parsedPrice * parsedQuantity + deliveryFee;
+    const overweight = isOverWeight(parsedQuantity);
+
 
 
     const increase = () => setQuantity(prev => prev + 1);
@@ -110,6 +113,16 @@ export default function ProductDetail() {
                             }}
                             onRightPress={() => {
                                 console.log('✅ 바로구매');
+                                router.push({
+                                    pathname : 'MainPage/OrderPage',
+                                    params: {
+                                        name,
+                                        price,
+                                        image_url,
+                                        quantity,
+                                        deliveryFee,
+                                    }
+                                })
                             }}
                             disabled={overweight} // ✅ 중량 초과 시 버튼 비활성화
                         />
