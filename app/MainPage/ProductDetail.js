@@ -10,7 +10,7 @@ import styles from '../Styles/ProductDetailStyle';
 
 export default function ProductDetail() {
     const router = useRouter();
-    const { name, price, image_url } = useLocalSearchParams(); // ProductList에서 전달됨
+    const { product_id, name, price, image_url } = useLocalSearchParams(); // ProductList에서 전달됨
 
     const [quantity, setQuantity] = useState(1); // ✅ 이 줄이 누락됨
     const getDeliveryFee = (quantity) => {
@@ -116,6 +116,7 @@ export default function ProductDetail() {
                                 router.push({
                                     pathname : 'MainPage/OrderPage',
                                     params: {
+                                        product_id,
                                         name,
                                         price,
                                         image_url,

@@ -24,7 +24,7 @@ export default function AdminMainPage() {
                 <DoubleButtonRow
                     leftLabel="상태 관리"
                     rightLabel="상품 추가"
-                    onLeftPress={() => router.push('/admin/status')}
+                    onLeftPress={() => router.push('/MainPage/ProductList')}
                     onRightPress={() => router.push('/admin/AddProduct')}
                 />
             </ScrollView>

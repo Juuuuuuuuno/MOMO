@@ -15,7 +15,7 @@ export default function SetAddress() {
     const [phone, setPhone] = useState('');
     const [saveAddress, setSaveAddress] = useState(false);
 
-    const { name : productname, price, image_url, quantity, deliveryFee } = useLocalSearchParams();
+    const { name : productname, price, image_url, quantity, deliveryFee, product_id } = useLocalSearchParams();
     
 
     const handleSubmit = () => {
@@ -24,7 +24,7 @@ export default function SetAddress() {
             return;
         }
 
-        console.log('[주소 등록] 이름 : ', name,'주소 : ', address, '번호 : ',phone);
+        console.log('[주소 등록] 이름 : ', name,'/ 주소 : ', address, '/ 번호 : ',phone);
         console.log('✅ 주소 등록 완료');
 
         // 이후 DB 저장 로직은 이곳에 추가 예정
@@ -32,6 +32,7 @@ export default function SetAddress() {
         router.replace({
         pathname: 'MainPage/OrderPage',
             params: {
+                product_id,
                 name : productname,
                 price,
                 image_url,

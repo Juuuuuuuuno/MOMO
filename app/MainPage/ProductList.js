@@ -29,6 +29,7 @@ export default function ProductList() {
                         name: item.name,
                         price: item.price,
                         image_url: item.image_url,
+                        product_id: item.id,
                     },
                 })
             }

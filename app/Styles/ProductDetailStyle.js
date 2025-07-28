@@ -128,4 +128,50 @@ export default StyleSheet.create({
         flexShrink: 1,
     },
 
+    //관리자
+    modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    input: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalButton: {
+        flex: 1,
+        backgroundColor: '#ff7675',
+        padding: 10,
+        marginHorizontal: 5,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+
+
 });

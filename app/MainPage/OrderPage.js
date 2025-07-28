@@ -22,6 +22,7 @@ export default function OrderPage() {
 
     // 전달받은 파라미터
     const {
+        product_id,
         name,
         price,
         image_url,
@@ -31,6 +32,8 @@ export default function OrderPage() {
         address,
         phone,
     } = useLocalSearchParams();
+
+    console.log('✅ 받아온 product_id:', product_id);  // 이거 추가
 
     const parsedPrice = Number(price) || 0;
     const parsedQuantity = Number(quantity) || 0;
@@ -74,6 +77,7 @@ export default function OrderPage() {
                                         router.push({
                                             pathname: '/MainPage/SetAddress',
                                             params: {
+                                                product_id,
                                                 name,
                                                 price,
                                                 image_url,
@@ -106,6 +110,7 @@ export default function OrderPage() {
                                         router.push({
                                             pathname: '/MainPage/SetAddress',
                                             params: {
+                                                product_id,
                                                 name,
                                                 price,
                                                 image_url,
@@ -170,6 +175,32 @@ export default function OrderPage() {
                     onPress={() => {
                         console.log('✅ 결제 시도');
                         console.log('요청사항:', requestNote);
+
+                        const today = new Date();
+                        const deadline = new Date(today);
+                        deadline.setDate( today.getDate() + 2 );
+                        deadline.setHours( 23, 59, 0, 0 );
+
+                        const yyyymmdd = today.toISOString().slice(0,10).replace(/-/g,'');
+                        const randomNum = Math.floor(Math.random() * 9000) + 1000;
+                        const orderNumber = `${yyyymmdd}${randomNum}`; 
+
+                        router.push({
+                                pathname: 'MainPage/PayPage',
+                                params: {
+                                    product_id,
+                                    name,
+                                    price,
+                                    totalPrice,
+                                    quantity,
+                                    recipient,
+                                    address,
+                                    phone,
+                                    requestNote,
+                                    orderNumber,
+                                    deadline: deadline.toISOString().slice(0, 10) + ' 23:59',
+                                },
+                            });
                     }}
                 />
             </View>

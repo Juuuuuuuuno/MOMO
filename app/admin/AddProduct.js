@@ -96,7 +96,7 @@ export default function AddProduct() {
             {
             text: '예',
             onPress: () => {
-                router.push('/ProductList'); // ✅ 페이지 이동 (expo-router 사용 시)
+                router.push('MainPage/ProductList'); // ✅ 페이지 이동 (expo-router 사용 시)
             },
             },
         ]
