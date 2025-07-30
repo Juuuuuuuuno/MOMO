@@ -5,10 +5,14 @@ import { useRouter } from 'expo-router';
 import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import styles from '../Styles/ProductListStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProductList() {
     const router = useRouter();
     const [products, setProducts] = useState([]);
+
+    //login에서 받아온 어드민인지 아닌지
+    const[isAdmin, setIsAdmin] = useState(false)
 
     useEffect(() => {
         fetch('http://192.168.35.144:3001/api/products')
@@ -17,6 +21,10 @@ export default function ProductList() {
             .catch(err => {
                 console.error('❌ 상품 불러오기 실패:', err);
             });
+
+        AsyncStorage.getItem('is_admin').then(value => {
+            setIsAdmin(Number(value) === 1 );
+        })
     }, []);
 
     const renderItem = ({ item }) => (
@@ -24,7 +32,7 @@ export default function ProductList() {
             style={styles.productCard}
             onPress={() =>
                 router.push({
-                    pathname: 'MainPage/ProductDetail',
+                    pathname: isAdmin ? 'admin/ProductDetail' : 'MainPage/ProductDetail',
                     params: {
                         name: item.name,
                         price: item.price,

@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/Juuuuuuuuno/MOMO#readme",
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "expo": "^53.0.13",
     "expo-checkbox": "~4.1.4",
@@ -31,6 +34,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-native": "^0.79.5",
-    "react-native-web": "^0.20.0"
+    "react-native-web": "^0.20.0",
+    "solapi": "^5.5.1"
   }
 }

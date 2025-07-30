@@ -6,6 +6,7 @@ import BackButton from '../Components/Button/BackButton';
 import InputField from '../Components/InputField/InputField';
 import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle';
+import axios from 'axios';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -30,10 +31,26 @@ export default function Register() {
                     onChangeText={setPhone}
                     keyboardType="numeric"
                 />
+
                 <FullWidthButton
                     label="다음"
                     disabled={!isValid}
-                    onPress={() => router.push('/Login/registerauth')} // ✅ 페이지 이동
+                    onPress={async () => {
+                        try {
+                        await axios.post('http://192.168.35.144:3001/api/send-auth-code', {
+                            phone: phone.replace(/-/g, '') // 하이픈 제거
+                        });
+
+                        // 성공 시 다음 페이지로 이동
+                        router.push({
+                            pathname: '/Login/registerauth',
+                            params: { name, phone }
+                        });
+                        } catch (error) {
+                        console.error('❌ 인증번호 요청 실패:', error.response?.data || error.message);
+                        Alert.alert('오류', '인증번호 요청 실패');
+                        }
+                    }}
                 />
             </View>
         </SafeAreaView>

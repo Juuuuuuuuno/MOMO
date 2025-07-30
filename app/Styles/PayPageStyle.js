@@ -41,6 +41,11 @@ const styles = StyleSheet.create({
         color: '#666',
         marginTop: 4,
     },
+        accountHint2: {
+        fontSize: 16,
+        color: '#0000FF',
+        marginTop: 4,
+    },
     value: {
         fontSize: 16,
         marginTop: 4,

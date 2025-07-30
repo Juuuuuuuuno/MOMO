@@ -1,11 +1,12 @@
 //app/MainPage/PayPage.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Modal, Pressable } from 'react-native';
 import DoubleButtonRowIndividualDisable from '../Components/Button/DoubleButtonRowIndividualDisable';
 import { useRoute } from '@react-navigation/native';
 import styles from '../Styles/PayPageStyle';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PayPage = () => {
     const route = useRoute();
@@ -22,11 +23,22 @@ const PayPage = () => {
         orderNumber,
         deadline,
     } = route.params;
-    const [canClose, setCanClose] = useState(false);
+    const [canClose, setCanClose] = useState(false); //닫기 버튼 상태
+    const [canSubmit, setCanSubmit] = useState(true); // 입금완료 버튼 상태
 
     const [modalVisible, setModalVisible] = useState(false);
 
     const router = useRouter();
+
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const fetchUserId = async () => {
+            const storedId = await AsyncStorage.getItem('user_id');
+            setUserId(Number(storedId)); // 반드시 숫자로 변환
+        };
+        fetchUserId();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -40,7 +52,7 @@ const PayPage = () => {
             <Text style={styles.label}>계좌 정보</Text>
             <Text style={styles.account}>• 농협 356-1416-3712-53</Text>
             <Text style={styles.account}>• 예금주 : 이준호</Text>
-            <Text style={styles.accountHint}>
+            <Text style={styles.accountHint2}>
             입금자 명은 이름+휴대폰 뒷번호로 입금해 주세요.{'\n'}
             예시 : 홍길동1234
             </Text>
@@ -64,12 +76,13 @@ const PayPage = () => {
             leftLabel="닫기"
             rightLabel="입금 완료"
             leftDisabled={!canClose}
-            rightDisabled={false}
+            rightDisabled={!canSubmit}
             onLeftPress={() => {
                 if (canClose) router.replace('MainPage/ProductList');
+                //router.replace('MainPage/ProductList');
             }}
             onRightPress={() => {
-                setModalVisible(true);
+                if (canSubmit) setModalVisible(true);
             }}
         />
             <Modal
@@ -84,12 +97,16 @@ const PayPage = () => {
                     <Pressable
                         style={styles.modalButton}
                         onPress={async () => {
+                            if (!userId) {
+                                alert('사용자 정보를 불러오고 있습니다. 잠시 후 다시 시도해 주세요.');
+                                return;
+                            }
                             try {
                             const res = await fetch('http://192.168.35.144:3001/api/orders', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                user_id : 1, // ⚠️ 실제 로그인 유저 ID로 교체 필요
+                                user_id : userId,
                                 recipient,
                                 recipient_address: address,
                                 recipient_phone: phone,
@@ -112,8 +129,26 @@ const PayPage = () => {
 
                             if (res.ok) {
                                 console.log('✅ 주문 저장 성공:', data);
+
+                                // ✅ 문자 발송 요청
+                                await fetch('http://192.168.35.144:3001/api/send-payment-alert', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                    orderNumber,
+                                    name,
+                                    totalPrice,
+                                    quantity,
+                                    user_id : userId,
+                                    orderId:data.order_id
+                                    }),
+                                });
+
+                                setCanSubmit(false); //입금완료 비활성화
                                 setModalVisible(false);
-                                setCanClose(true);
+                                setCanClose(true); //닫기 활성화
+                                
+
                             } else {
                                 console.error('❌ 주문 저장 실패:', data.message);
                                 alert('주문 저장에 실패했습니다.');

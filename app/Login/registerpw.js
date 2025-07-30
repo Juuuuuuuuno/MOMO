@@ -6,11 +6,16 @@ import BackButton from '../Components/Button/BackButton';
 import InputField from '../Components/InputField/InputFieldpw'; // ✅ InputField 추가
 import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle';
+import axios from 'axios';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function RegisterPw() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
+
+    //전달 받은 이름/전화번호
+    const { name, phone } = useLocalSearchParams();
 
     const isValid = password.length >= 8;
 
@@ -42,14 +47,29 @@ export default function RegisterPw() {
             <Text>비밀번호 표시</Text>
         </TouchableOpacity>
 
-        <FullWidthButton
-            label="시작하기"
-            disabled={!isValid}
-            onPress={ () => {
-                console.log('회원가입 완료')
-                router.push('/Login/login')
-            }}
-        />
+<FullWidthButton
+    label="시작하기"
+    disabled={!isValid}
+    onPress={async () => {
+        try {
+        const response = await axios.post('http://192.168.35.144:3001/api/register', {
+            name,
+            phone,
+            pw: password
+        });
+
+        if (response.data.success) {
+            router.push('/Login/login'); // 회원가입 후 로그인 화면으로 이동
+        } else {
+            Alert.alert('회원가입 실패', '서버 오류');
+        }
+        } catch (error) {
+        console.error('회원가입 오류:', error.response?.data || error.message);
+        Alert.alert('회원가입 실패', error.response?.data?.message || '서버 오류');
+        }
+    }}
+/>
+
         </View>
     </SafeAreaView>
     );

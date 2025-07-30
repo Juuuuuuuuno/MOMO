@@ -9,8 +9,8 @@ const Intro = () => {
   const router = useRouter(); // 라우터 인스턴스
 
     const handleStart = () => {
-    //router.push('/Login/login')
-    router.push('admin/main')
+    router.push('/Login/login')
+    //router.push('admin/main')
     };
 
     const handleSignup = () => {
