@@ -19,7 +19,7 @@ export default function MainPage() {
             <FullWidthButton
             label="주문하기"
             onPress={() => {
-                console.log('주문하기')
+                console.log('📜 주문하기')
                 router.push('MainPage/ProductList')
                     }
                 }

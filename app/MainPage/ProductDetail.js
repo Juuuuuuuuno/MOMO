@@ -7,6 +7,8 @@ import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import DoubleButtonRowDisable from '../Components/Button/DoubleButtonRowDisable';
 import styles from '../Styles/ProductDetailStyle';
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProductDetail() {
     const router = useRouter();
@@ -44,7 +46,7 @@ export default function ProductDetail() {
                         <BackButton onPress={() => router.back()} />
                         <Text style={styles.headerTitle}>상품 구매</Text>
                         <View style={styles.iconGroup}>
-                            <IconButton iconSource={require('../../assets/15050.png')} onPress={() => {}} />
+                            <IconButton iconSource={require('../../assets/15050.png')} onPress={() => { router.push('/MainPage/ShoppingCart')}} />
                         </View>
                     </View>
 
@@ -108,9 +110,37 @@ export default function ProductDetail() {
                         <DoubleButtonRowDisable
                             leftLabel="장바구니 담기"
                             rightLabel="바로구매"
-                            onLeftPress={() => {
+                            onLeftPress={async () => {
                                 console.log('🛒 장바구니 담기');
-                            }}
+                                try {
+                                        const existing = await AsyncStorage.getItem('cart');
+                                        const prevItems = existing ? JSON.parse(existing) : [];
+
+                                        const newItem = {
+                                            product_id,
+                                            name,
+                                            price: Number(price),
+                                            image_url: `http://192.168.35.144:3001${image_url}`, // 전체 URL로 저장
+                                            quantity,
+                                            deliveryFee,
+                                        };
+
+                                        const index = prevItems.findIndex(item => item.name === name);
+                                        if (index > -1) {
+                                            // ✅ 기존 상품이면 수량 증가
+                                            prevItems[index].quantity += quantity;
+                                            await AsyncStorage.setItem('cart', JSON.stringify(prevItems));
+                                        } else {
+                                            const updated = [...prevItems, newItem];
+                                            await AsyncStorage.setItem('cart', JSON.stringify(updated));
+                                        }
+
+                                        Alert.alert('알림', '장바구니에 상품을 담았습니다.');
+                                    } catch (e) {
+                                        console.error('장바구니 저장 오류:', e);
+                                    }
+                                }}
+
                             onRightPress={() => {
                                 console.log('✅ 바로구매');
                                 router.push({

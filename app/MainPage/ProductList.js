@@ -56,11 +56,13 @@ export default function ProductList() {
         <SafeAreaView style={styles.container}>
             {/* 상단 헤더 */}
             <View style={styles.headerRow}>
-                <BackButton onPress={() => router.back()} />
+                <View style={{ width: 70 }}>
+                    <BackButton onPress={() => router.back()} />
+                </View>
                 <Text style={styles.headerTitle}>상품 목록</Text>
                 <View style={styles.iconGroup}>
-                    <IconButton iconSource={require('../../assets/13267.png')} onPress={() => {}} />
-                    <IconButton iconSource={require('../../assets/15050.png')} onPress={() => {}} />
+                    <IconButton iconSource={require('../../assets/receipt.png')} onPress={() => { router.push('/MainPage/ProductCheck'), console.log("🧾 주문목록")}} />
+                    <IconButton iconSource={require('../../assets/15050.png')} onPress={() => { router.push('/MainPage/ShoppingCart'), console.log("🛒 장바구니")}} />
                 </View>
             </View>
 

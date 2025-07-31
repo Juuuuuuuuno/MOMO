@@ -32,6 +32,9 @@ const PayPage = () => {
 
     const [userId, setUserId] = useState(null);
 
+    //장바구니 목록
+    const cartData = route.params.cart ? JSON.parse(route.params.cart) : null;
+
     useEffect(() => {
         const fetchUserId = async () => {
             const storedId = await AsyncStorage.getItem('user_id');
@@ -106,24 +109,38 @@ const PayPage = () => {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                user_id : userId,
-                                recipient,
-                                recipient_address: address,
-                                recipient_phone: phone,
-                                request_note: requestNote,
-                                total_price: totalPrice,
-                                status: '입금대기',
-                                order_number: orderNumber,
-                                items: [
-                                    {
-                                    product_id, // OrderPage.js 에서 받아온 값 ( ProductList.js -> ProductDetail.js -> OrderPage.js 로 값 이동)
-                                    quantity, //수량 OrderPage.js에서 받아옴
-                                    price_each: Number(price), //단일 상품 products table에 있음
-                                    },
-                                ],
+                                    user_id : userId,
+                                    recipient,
+                                    recipient_address: address,
+                                    recipient_phone: phone,
+                                    request_note: requestNote,
+                                    total_price: totalPrice,
+                                    status: '입금대기',
+                                    order_number: orderNumber,
+                                    items: Array.isArray(cartData) && cartData.length > 0
+                                        ? cartData
+                                        .filter(item => item.product_id)
+                                        .map((item) => ({
+                                            product_id: item.product_id,
+                                            quantity: item.quantity,
+                                            price_each: Number(item.price),
+                                        }))
+                                        : [
+                                            {
+                                            product_id : Number(product_id),
+                                            quantity:Number(quantity),
+                                            price_each: Number(price),
+                                            },
+                                        ],
                                 }),
                             });
                             console.log('✅ 보낼 상품 : ',product_id)
+                            console.log('🧾 보낼 items: ', Array.isArray(cartData) && cartData.length > 0
+                                ? '장바구니 주문' : [{
+                                product_id: Number(product_id),
+                                quantity:Number(quantity),
+                                price_each: Number(price)
+                            }]);
 
                             const data = await res.json();
 

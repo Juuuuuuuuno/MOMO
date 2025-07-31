@@ -15,7 +15,7 @@ export default function SetAddress() {
     const [phone, setPhone] = useState('');
     const [saveAddress, setSaveAddress] = useState(false);
 
-    const { name : productname, price, image_url, quantity, deliveryFee, product_id } = useLocalSearchParams();
+    const { name : productname, price, image_url, quantity, deliveryFee, product_id, cart } = useLocalSearchParams();
     
 
     const handleSubmit = () => {
@@ -41,6 +41,7 @@ export default function SetAddress() {
                 recipient: name,
                 address,
                 phone,
+                cart: cart || '',
             },
         });
     };

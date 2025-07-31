@@ -42,11 +42,10 @@ export default StyleSheet.create({
         color: '#FF0000',
         marginTop: 4,
     },
-        headerTitle: {
+    headerTitle: {
+        flex: 1,
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        alignItems:'center',
-        justifyContent:'center'
-        },
+    },
 });

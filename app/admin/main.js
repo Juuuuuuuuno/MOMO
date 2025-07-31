@@ -4,7 +4,10 @@ import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import FarmInfoCard from '../Components/FarmInfo/FarmInfoCard';
 import DoubleButtonRow from '../Components/Button/DoubleButtonRow';
+import ColoredFullWidthButton from '../Components/Button/ColoredFullWidthButton';
 import styles from '../Styles/MainStyle';
+import { ImageBackground } from 'react-native-web';
+import { setStatusBarBackgroundColor } from 'expo-status-bar';
 
 export default function AdminMainPage() {
     const router = useRouter();
@@ -24,8 +27,13 @@ export default function AdminMainPage() {
                 <DoubleButtonRow
                     leftLabel="상태 관리"
                     rightLabel="상품 추가"
-                    onLeftPress={() => router.push('/MainPage/ProductList')}
-                    onRightPress={() => router.push('/admin/AddProduct')}
+                    onLeftPress={() => {router.push('/admin/SetStatus'), console.log("🛠 상태변경")}}
+                    onRightPress={() => {router.push('/admin/AddProduct'), console.log("🍑 상품추가")}}
+                />
+
+                <ColoredFullWidthButton
+                    label="상품 목록"
+                    onPress={()=> {router.push('/MainPage/ProductList'), console.log("📜상품목록")}}
                 />
             </ScrollView>
         </SafeAreaView>
