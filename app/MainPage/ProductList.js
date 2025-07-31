@@ -1,7 +1,7 @@
 //app/MainPage/ProductList.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import styles from '../Styles/ProductListStyle';
@@ -13,6 +13,8 @@ export default function ProductList() {
 
     //login에서 받아온 어드민인지 아닌지
     const[isAdmin, setIsAdmin] = useState(false)
+
+    const { from } = useLocalSearchParams();
 
     useEffect(() => {
         fetch('http://192.168.35.144:3001/api/products')
@@ -57,7 +59,13 @@ export default function ProductList() {
             {/* 상단 헤더 */}
             <View style={styles.headerRow}>
                 <View style={{ width: 70 }}>
-                    <BackButton onPress={() => router.back()} />
+                    <BackButton onPress={()=>{
+                        if (from === 'adminAdd') {
+                        router.replace('/admin/Home'); // 👈 어드민 추가 후 복귀는 홈으로
+                        } else {
+                            router.back(); // 👈 일반 사용자는 원래대로
+                        }
+                    }} />
                 </View>
                 <Text style={styles.headerTitle}>상품 목록</Text>
                 <View style={styles.iconGroup}>

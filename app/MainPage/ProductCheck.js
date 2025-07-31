@@ -8,7 +8,6 @@ import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 
 const statusIcons = {
-    '상품준비중': '🧾',
     '입금대기': '💰',
     '배송중': '🚚',
     '배송완료': '📦',
@@ -107,10 +106,15 @@ const ProductCheck = () => {
                                                     <Text style={styles.statusText}>{product.status}</Text>
                                                 </View>
                                                 <Text style={styles.name}>{product.product_name}</Text>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={styles.price}>{totalPrice.toLocaleString()}원</Text>
-                                                    <Text style={styles.quantity}>  {product.quantity}개</Text>
-                                                </View>
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                        <Text style={styles.price}>
+                                                            {(product.price_each * product.quantity).toLocaleString()}원
+                                                            <Text style={{ fontSize: 13, color: '#888' }}>
+                                                                {' '}+ 배송비 {deliveryFee.toLocaleString()}원
+                                                            </Text>
+                                                        </Text>
+                                                        <Text style={styles.quantity}>  {product.quantity}개</Text>
+                                                    </View>
                                             </View>
                                         </View>
                                     </View>

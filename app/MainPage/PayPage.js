@@ -161,6 +161,8 @@ const PayPage = () => {
                                     }),
                                 });
 
+                                await AsyncStorage.removeItem('cart'); // ✅ 장바구니 초기화
+
                                 setCanSubmit(false); //입금완료 비활성화
                                 setModalVisible(false);
                                 setCanClose(true); //닫기 활성화

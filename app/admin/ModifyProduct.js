@@ -66,7 +66,7 @@ export default function ModifyProduct() {
             }
 
             Alert.alert('수정 완료', '상품 정보가 수정되었습니다.');
-            router.push('/MainPage/ProductList');
+            router.replace('/MainPage/ProductList');
         } catch (err) {
             Alert.alert('오류', '서버에 연결할 수 없습니다.');
         }
@@ -85,7 +85,7 @@ export default function ModifyProduct() {
             }
 
             Alert.alert('삭제 완료', '상품이 삭제되었습니다.');
-            router.push('/MainPage/ProductList');
+            router.replace('/MainPage/ProductList');
         } catch (err) {
             Alert.alert('오류', '서버에 연결할 수 없습니다.');
         }
