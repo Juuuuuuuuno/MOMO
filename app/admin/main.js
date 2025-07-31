@@ -34,6 +34,7 @@ export default function AdminMainPage() {
                 <ColoredFullWidthButton
                     label="상품 목록"
                     onPress={()=> {router.push('/MainPage/ProductList'), console.log("📜상품목록")}}
+                    backgroundColor={"#888"}
                 />
             </ScrollView>
         </SafeAreaView>
