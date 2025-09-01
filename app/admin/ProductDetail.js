@@ -17,6 +17,7 @@ import IconButton from '../Components/Button/IconButton';
 import DoubleButtonRowDisable from '../Components/Button/DoubleButtonRowDisable';
 import styles from '../Styles/ProductDetailStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SERVER_DOMAIN } from '@env';
 
 export default function ProductDetail() {
     const router = useRouter();
@@ -56,7 +57,7 @@ export default function ProductDetail() {
                 </View>
 
                 <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom: 200 }]}>
-                    <Image source={{ uri: `http://192.168.35.144:3001${image_url}` }} style={styles.image} />
+                    <Image source={{ uri: `${SERVER_DOMAIN}${image_url}` }} style={styles.image} />
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={styles.productName}>{name}</Text>
@@ -127,7 +128,7 @@ export default function ProductDetail() {
                                     product_id,
                                     name,
                                     price: Number(price),
-                                    image_url: `http://192.168.35.144:3001${image_url}`,
+                                    image_url: `${SERVER_DOMAIN}${image_url}`,
                                     quantity,
                                     deliveryFee,
                                 };

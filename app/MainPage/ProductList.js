@@ -6,6 +6,7 @@ import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import styles from '../Styles/ProductListStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SERVER_DOMAIN } from '@env';
 
 export default function ProductList() {
     const router = useRouter();
@@ -17,7 +18,7 @@ export default function ProductList() {
     const { from } = useLocalSearchParams();
 
     useEffect(() => {
-        fetch('http://192.168.35.144:3001/api/products')
+        fetch(`${SERVER_DOMAIN}/api/products`)
             .then(res => res.json())
             .then(data => setProducts(data))
             .catch(err => {
@@ -44,7 +45,7 @@ export default function ProductList() {
                 })
             }
         >
-            <Image source={{ uri: `http://192.168.35.144:3001${item.image_url}` }} style={styles.productImage} />
+            <Image source={{ uri: `${SERVER_DOMAIN}${item.image_url}` }} style={styles.productImage} />
             <View style={styles.infoRow}>
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₩{item.price.toLocaleString()}</Text>

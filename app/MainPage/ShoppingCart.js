@@ -14,6 +14,7 @@ import BackButton from '../Components/Button/BackButton';
 import MainButton from '../Components/Button/MainButton';
 import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/ShoppingCartStyle';
+import { SERVER_DOMAIN } from '@env';
 
 export default function ShoppingCart() {
     const router = useRouter();
@@ -32,7 +33,7 @@ export default function ShoppingCart() {
                         name: params.name,
                         price: Number(params.price),
                         quantity: Number(params.quantity),
-                        image_url: `http://192.168.35.144:3001${params.image_url}`,
+                        image_url: `${SERVER_DOMAIN}${params.image_url}`,
                         deliveryFee: Number(params.deliveryFee),
                     };
 

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../Styles/ProductCheckStyle';
 import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
+import { SERVER_DOMAIN } from '@env';
 
 const statusIcons = {
     '입금대기': '💰',
@@ -24,7 +25,7 @@ const ProductCheck = () => {
             if (storedId) {
                 setUserId(Number(storedId));
                 try {
-                    const res = await fetch(`http://192.168.35.144:3001/api/user-orders/${storedId}`);
+                    const res = await fetch(`${SERVER_DOMAIN}/api/user-orders/${storedId}`);
                     const data = await res.json();
                     if (res.ok) {
                         setOrders(data);
@@ -97,7 +98,7 @@ const ProductCheck = () => {
                                     <View key={product.order_item_id} style={styles.card}>
                                         <View style={styles.contentContainer}>
                                             <Image
-                                                source={{ uri: `http://192.168.35.144:3001${product.image_url}` }}
+                                                source={{ uri: `${SERVER_DOMAIN}${product.image_url}` }}
                                                 style={styles.image}
                                             />
                                             <View style={styles.info}>

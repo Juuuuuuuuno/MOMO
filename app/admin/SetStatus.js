@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import styles from '../Styles/SetStatusStyle';
 import BackButton from '../Components/Button/BackButton';
+import { SERVER_DOMAIN } from '@env';
 
 export default function SetStatus() {
     const [expandedOrder, setExpandedOrder] = useState(null);
@@ -24,7 +25,7 @@ export default function SetStatus() {
     const sortedDates = Object.keys(orders).sort((a, b) => b.localeCompare(a));
 
     useEffect(() => {
-        axios.get(`http://192.168.35.144:3001/api/order-status?status=${selectedFilter}`)
+        axios.get(`${SERVER_DOMAIN}/api/order-status?status=${selectedFilter}`)
             .then(res => setOrders(res.data))
             .catch(err => console.error('주문 불러오기 실패:', err));
     }, [selectedFilter]);
@@ -151,13 +152,13 @@ export default function SetStatus() {
                                     setConfirmModalVisible(false);
 
                                     // ✅ 상태 변경 API 호출
-                                    axios.post('http://192.168.35.144:3001/api/update-order-status', {
+                                    axios.post(`${SERVER_DOMAIN}/api/update-order-status`, {
                                         order_number: selectedOrderId,
                                         new_status: selectedStatus,
                                     })
                                     .then(() => {
                                         // ✅ 상태 변경 후, 다시 주문 목록 새로고침
-                                        axios.get(`http://192.168.35.144:3001/api/order-status?status=${selectedFilter}`)
+                                        axios.get(`${SERVER_DOMAIN}/api/order-status?status=${selectedFilter}`)
                                             .then(res => setOrders(res.data))
                                             .catch(err => console.error('주문 다시 불러오기 실패:', err));
                                     })

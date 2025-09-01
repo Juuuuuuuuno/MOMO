@@ -9,6 +9,7 @@ import DoubleButtonRowDisable from '../Components/Button/DoubleButtonRowDisable'
 import styles from '../Styles/ProductDetailStyle';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SERVER_DOMAIN } from '@env';
 
 export default function ProductDetail() {
     const router = useRouter();
@@ -52,7 +53,7 @@ export default function ProductDetail() {
 
                     {/* 본문 */}
                     <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom : 200 }]}>
-                        <Image source={{ uri: `http://192.168.35.144:3001${image_url}` }} style={styles.image} />
+                        <Image source={{ uri: `${SERVER_DOMAIN}${image_url}` }} style={styles.image} />
 
                         <Text style={styles.productName}>{name}</Text>
                         <Text style={styles.price}>
@@ -120,7 +121,7 @@ export default function ProductDetail() {
                                             product_id,
                                             name,
                                             price: Number(price),
-                                            image_url: `http://192.168.35.144:3001${image_url}`, // 전체 URL로 저장
+                                            image_url: `${SERVER_DOMAIN}${image_url}`, // 전체 URL로 저장
                                             quantity,
                                             deliveryFee,
                                         };

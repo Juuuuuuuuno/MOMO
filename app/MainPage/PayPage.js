@@ -7,6 +7,7 @@ import styles from '../Styles/PayPageStyle';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SERVER_DOMAIN } from '@env';
 
 const PayPage = () => {
     const route = useRoute();
@@ -105,7 +106,7 @@ const PayPage = () => {
                                 return;
                             }
                             try {
-                            const res = await fetch('http://192.168.35.144:3001/api/orders', {
+                            const res = await fetch(`${SERVER_DOMAIN}1/api/orders`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -148,7 +149,7 @@ const PayPage = () => {
                                 console.log('✅ 주문 저장 성공:', data);
 
                                 // ✅ 문자 발송 요청
-                                await fetch('http://192.168.35.144:3001/api/send-payment-alert', {
+                                await fetch(`${SERVER_DOMAIN}/api/send-payment-alert`, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({

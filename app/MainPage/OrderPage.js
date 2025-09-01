@@ -15,6 +15,7 @@ import AgreementBox from '../Components/Agreement/AgreementBox';
 import AgreementModal from '../Components/Agreement/AgreementModal';
 import InputField from '../Components/InputField/InputField';
 import styles from '../Styles/OrderPageStyle';
+import { SERVER_DOMAIN } from '@env';
 
 export default function OrderPage() {
     const router = useRouter();
@@ -159,7 +160,7 @@ export default function OrderPage() {
                         ))
                     ) : (
                         <View style={[styles.productBox, { marginBottom: 12 }]}>
-                            <Image source={{ uri: `http://192.168.35.144:3001${image_url}` }} style={styles.productImage} />
+                            <Image source={{ uri: `${SERVER_DOMAIN}1${image_url}` }} style={styles.productImage} />
                             <View style={styles.productInfo}>
                                 <Text style={styles.productName}>{name}</Text>
                                 <View style={styles.productInfoRow}>
