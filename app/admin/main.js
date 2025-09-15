@@ -8,6 +8,8 @@ import ColoredFullWidthButton from '../Components/Button/ColoredFullWidthButton'
 import styles from '../Styles/MainStyle';
 import { ImageBackground } from 'react-native-web';
 import { setStatusBarBackgroundColor } from 'expo-status-bar';
+import { SERVER_DOMAIN } from '@env';
+
 
 export default function AdminMainPage() {
     const router = useRouter();
