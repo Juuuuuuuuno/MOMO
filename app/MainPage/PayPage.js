@@ -106,7 +106,7 @@ const PayPage = () => {
                                 return;
                             }
                             try {
-                            const res = await fetch(`${SERVER_DOMAIN}1/api/orders`, {
+                            const res = await fetch(`${SERVER_DOMAIN}/api/orders`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({

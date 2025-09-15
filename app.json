@@ -1,27 +1,26 @@
 {
-    "expo": {
+  "expo": {
     "name": "MOMO",
     "slug": "MOMO",
     "version": "1.0.0",
     "orientation": "portrait",
-    "sdkVersion": "53.0.0",
     "platforms": ["ios", "android", "web"],
     "assetBundlePatterns": ["**/*"],
     "jsEngine": "hermes",
     "scheme": "momo",
 
     "ios": {
-    "infoPlist": {
+      "infoPlist": {
         "NSAppTransportSecurity": {
-        "NSAllowsArbitraryLoads": true,
-        "NSExceptionDomains": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
             "192.168.35.144": {
-            "NSExceptionAllowsInsecureHTTPLoads": true,
-            "NSIncludesSubdomains": true
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
             }
+          }
         }
-        }
+      }
     }
-    }
-    }
+  }
 }
