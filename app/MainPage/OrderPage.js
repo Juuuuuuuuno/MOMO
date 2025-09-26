@@ -16,6 +16,7 @@ import AgreementModal from '../Components/Agreement/AgreementModal';
 import InputField from '../Components/InputField/InputField';
 import styles from '../Styles/OrderPageStyle';
 import { SERVER_DOMAIN } from '@env';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 export default function OrderPage() {
     const router = useRouter();
