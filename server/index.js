@@ -24,6 +24,18 @@ app.use(express.json({ limit: '20mb' }));
 app.use('/uploads', express.static(uploadsDir));
 
 // ✅ MySQL 연결
+const db = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,  
+    waitForConnections: true,                       // db접속 요청이 들어오면 기다리게 할건지 거절할건지 정하는 옵션임
+    connectionLimit: 10,                                   // 동시에 접속 가능한 db의 수 10개 << 한번에 접속 가능한 유저수 라고 생각하면 될듯 // 그렇다면 11번째 사람을 위해 대기열 화면을 만드는게 좋을 것 같음
+    queueLimit: 0                                               // 대기열 크기 제한인데 그냥 무제한으로 둔거임
+})
+
+/* 이전 코드 << 연결이 오래 유지되면 끊기는 문제가 생김
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -31,6 +43,8 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
 });
+*/
+
 
 db.connect(err => {
     if (err) {
