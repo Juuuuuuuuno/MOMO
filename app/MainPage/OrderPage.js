@@ -1,5 +1,5 @@
 // app/MainPage/OrderPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // ✅ useEffect 추가
 import {
     View,
     Text,
@@ -16,7 +16,7 @@ import AgreementModal from '../Components/Agreement/AgreementModal';
 import InputField from '../Components/InputField/InputField';
 import styles from '../Styles/OrderPageStyle';
 import { SERVER_DOMAIN } from '@env';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 추가
 
 export default function OrderPage() {
     const router = useRouter();
@@ -35,7 +35,6 @@ export default function OrderPage() {
     } = useLocalSearchParams();
 
     const parsedCart = cart ? JSON.parse(cart) : [];
-
     const isCart = parsedCart.length > 0;
 
     const parsedPrice = Number(price) || 0;
@@ -43,20 +42,34 @@ export default function OrderPage() {
     const parsedDeliveryFee = Number(deliveryFee) || 0;
     const totalPriceSingle = parsedPrice * parsedQuantity + parsedDeliveryFee;
 
-    const getTotalPriceCart = () => {
-        return parsedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    };
-
+    const getTotalPriceCart = () => parsedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const getDeliveryFeeCart = () => {
         const totalQuantity = parsedCart.reduce((sum, item) => sum + item.quantity, 0);
         return totalQuantity <= 1 ? 5000 : 6000;
     };
-
     const totalPriceCart = getTotalPriceCart() + getDeliveryFeeCart();
 
     const [agreed, setAgreed] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [requestNote, setRequestNote] = useState('');
+
+    // ✅ 저장된 주소 불러오기
+    useEffect(() => {
+        const loadSavedAddress = async () => {
+            if (!recipient || !address || !phone) {
+                const saved = await AsyncStorage.getItem('savedAddress');
+                if (saved) {
+                    const { name, address, phone } = JSON.parse(saved);
+                    router.setParams({
+                        recipient: name,
+                        address,
+                        phone,
+                    });
+                }
+            }
+        };
+        loadSavedAddress();
+    }, []);
 
     const handleAgree = () => {
         setAgreed(true);
@@ -139,7 +152,7 @@ export default function OrderPage() {
                         )}
                     </View>
                 </View>
-
+                
                 {/* 주문 상품 */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>주문 상품</Text>

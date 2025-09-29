@@ -1,11 +1,12 @@
 // app/MainPage/SetAddress.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import CheckBox from 'expo-checkbox';
 import { useRouter } from 'expo-router';
 import BackButton from '../Components/Button/BackButton';
 import { useLocalSearchParams } from 'expo-router';
 import styles from '../Styles/SetAddressStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 추가
 
 export default function SetAddress() {
     const router = useRouter();
@@ -15,25 +16,43 @@ export default function SetAddress() {
     const [phone, setPhone] = useState('');
     const [saveAddress, setSaveAddress] = useState(false);
 
-    const { name : productname, price, image_url, quantity, deliveryFee, product_id, cart } = useLocalSearchParams();
-    
+    const { name: productname, price, image_url, quantity, deliveryFee, product_id, cart } = useLocalSearchParams();
 
-    const handleSubmit = () => {
+    // ✅ 저장된 주소 불러오기
+    useEffect(() => {
+        const loadSavedAddress = async () => {
+            const saved = await AsyncStorage.getItem('savedAddress');
+            if (saved) {
+                const { name, address, phone } = JSON.parse(saved);
+                setName(name);
+                setAddress(address);
+                setPhone(phone);
+                setSaveAddress(true);
+            }
+        };
+        loadSavedAddress();
+    }, []);
+
+    const handleSubmit = async () => {
         if (!name || !address || !phone) {
             Alert.alert('모든 항목을 입력해주세요.');
             return;
         }
 
-        console.log('[주소 등록] 이름 : ', name,'/ 주소 : ', address, '/ 번호 : ',phone);
+        console.log('[주소 등록] 이름 : ', name, '/ 주소 : ', address, '/ 번호 : ', phone);
         console.log('✅ 주소 등록 완료');
 
-        // 이후 DB 저장 로직은 이곳에 추가 예정
-        // 현재는 OrderPage로 전달
+        // ✅ 체크박스가 true라면 AsyncStorage에 저장
+        if (saveAddress) {
+            await AsyncStorage.setItem('savedAddress', JSON.stringify({ name, address, phone }));
+            console.log('💾 주소 저장 완료');
+        }
+
         router.replace({
-        pathname: 'MainPage/OrderPage',
+            pathname: 'MainPage/OrderPage',
             params: {
                 product_id,
-                name : productname,
+                name: productname,
                 price,
                 image_url,
                 quantity,
@@ -81,11 +100,18 @@ export default function SetAddress() {
             {/* 체크박스 */}
             <View style={styles.checkboxRow}>
                 <CheckBox value={saveAddress} onValueChange={setSaveAddress} />
-                <Text style={styles.checkboxLabel}>주소 저장하기</Text>
+                <Text style={styles.checkboxLabel}>다음에도 같은 주소 사용하기</Text>
             </View>
 
             {/* 등록하기 버튼 */}
-            <TouchableOpacity style={[styles.submitBtn, !(name && address && phone) && { backgroundColor : '#ccc'}, ]} onPress={handleSubmit} disabled={!(name && address && phone) }>
+            <TouchableOpacity
+                style={[
+                    styles.submitBtn,
+                    !(name && address && phone) && { backgroundColor: '#ccc' },
+                ]}
+                onPress={handleSubmit}
+                disabled={!(name && address && phone)}
+            >
                 <Text style={styles.submitBtnText}>등록하기</Text>
             </TouchableOpacity>
         </View>

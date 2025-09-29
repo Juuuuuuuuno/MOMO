@@ -82,6 +82,8 @@ export default function Login() {
                       // ✅ 관리자 여부 저장 (ProductList.js 등에서 사용할 수 있도록)
                       await AsyncStorage.setItem('is_admin',is_admin.toString())
                       await AsyncStorage.setItem('user_id',user_id.toString())
+                      await AsyncStorage.setItem('is_logged_in','true')     // ✅ 로그인 상태 저장
+                      await AsyncStorage.setItem('phone', phone);           // ✅ 전화번호 저장 (로그아웃 시 사용)
                       
                       //누가 어떤 로그인 했는지
                       const role = is_admin === 1 ? '관리자' : '사용자';
