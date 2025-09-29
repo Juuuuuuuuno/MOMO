@@ -40,6 +40,7 @@ export default function MainPage() {
                     label="주문하기"
                     onPress={() => {
                         console.log('📜 주문하기');
+                        //router.push('Loading/Loading');
                         router.push('MainPage/ProductList');
                     }}
                 />
