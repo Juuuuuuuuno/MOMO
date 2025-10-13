@@ -8,7 +8,7 @@ import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import { SERVER_DOMAIN } from '@env';
 
-// ✅ 추가: 피드백 모달 & axios
+// ✅ 피드백 모달 & axios
 import FeedbackModal from '../Components/Feedback/FeedbackModal';
 import axios from 'axios';
 
@@ -23,7 +23,7 @@ const statusIcons = {
     const [orders, setOrders] = useState([]);
     const [userId, setUserId] = useState(null);
 
-    // ✅ 추가: 배송완료 피드백 모달 상태
+    // ✅ 배송완료 피드백 모달 상태
     const [showDeliveryFeedback, setShowDeliveryFeedback] = useState(false);
     const [deliveredOrderId, setDeliveredOrderId] = useState(null);
 
@@ -38,20 +38,40 @@ const statusIcons = {
             if (res.ok) {
                 setOrders(data);
 
-                // ✅ 추가: 배송완료 주문이 있는지 확인하고, 최초 1회만 모달 표시
-                // data 형태: 서버가 반환하는 배열(주문+아이템 join). 최신 배송완료 주문 1건을 추출
-                const delivered = Array.isArray(data)
-                ? data
-                    .filter(it => it.status === '배송완료')
-                    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))[0]
-                : null;
+                /**
+                 * ✅ 변경 요지 (중요)
+                 * - 동일 주문(order_id)에 여러 아이템(row)이 있어도 피드백은 "주문별 1회"만 노출해야 함.
+                 * - 따라서 row(아이템) 단위가 아닌 order_id 단위로 고유화하여 후보를 만든 뒤,
+                 *   "아직 피드백 안 한 주문"을 최신(created_at) 순으로 1건만 선택해서 모달을 띄움.
+                 */
 
-                if (delivered && delivered.order_id) {
-                const guardKey = `feedback_delivery_${delivered.order_id}`;
+                // 1) 배송완료인 row만 모아 order_id별 "가장 최신 created_at"을 기록
+                const latestByOrder = {}; // { [order_id]: { created_at, ...row } }
+                for (const it of (Array.isArray(data) ? data : [])) {
+                if (it.status !== '배송완료') continue;
+                const k = it.order_id;
+                // created_at 최신값으로 갱신
+                if (!latestByOrder[k] || (it.created_at || '') > (latestByOrder[k].created_at || '')) {
+                    latestByOrder[k] = it;
+                }
+                }
+
+                // 2) order_id 목록을 최신 created_at 기준 내림차순 정렬
+                const orderedIds = Object.keys(latestByOrder)
+                .map(id => Number(id))
+                .sort((a, b) =>
+                    (latestByOrder[b]?.created_at || '').localeCompare(latestByOrder[a]?.created_at || '')
+                );
+
+                // 3) 아직 피드백 안 한 주문(order_id) 1건만 선택 → 모달 표시
+                for (const oid of orderedIds) {
+                const guardKey = `feedback_delivery_${oid}`;
+                // 이미 처리(닫기/제출)했던 주문은 스킵
                 const done = await AsyncStorage.getItem(guardKey);
                 if (!done) {
-                    setDeliveredOrderId(delivered.order_id);
+                    setDeliveredOrderId(oid);
                     setShowDeliveryFeedback(true);
+                    break;
                 }
                 }
             } else {
@@ -69,17 +89,13 @@ const statusIcons = {
     // ✅ 날짜와 주문번호 기준으로 그룹화 (기존 유지)
     const groupedData = useMemo(() => {
         const grouped = {};
-
         orders.forEach((item) => {
         const date = item.created_at?.slice(0, 10);
         const orderNumber = item.order_number;
-
         if (!grouped[date]) grouped[date] = {};
         if (!grouped[date][orderNumber]) grouped[date][orderNumber] = [];
-
         grouped[date][orderNumber].push(item);
         });
-
         return Object.entries(grouped).map(([date, ordersByNumber]) => ({
         title: date,
         data: Object.entries(ordersByNumber).map(([orderNumber, items]) => ({
@@ -106,7 +122,7 @@ const statusIcons = {
             <SectionList
             sections={groupedData}
             keyExtractor={(item, index) => item.orderNumber + index}
-            stickySectionHeadersEnabled={false} // ✅ 고정 해제하여 스크롤 시 따라오도록 변경
+            stickySectionHeadersEnabled={false}
             renderSectionHeader={({ section: { title } }) => (
                 <View style={styles.sectionCard}>
                 <Text style={styles.date}>{title} 주문</Text>
@@ -151,26 +167,42 @@ const statusIcons = {
             />
         )}
 
-        {/* ✅ 추가: 배송완료(앱/배송 관련) 피드백 모달 — 최초 1회만 */}
+        {/* ✅ 배송완료(앱/배송 관련) 피드백 모달 — “주문별 1회”만 노출 */}
         <FeedbackModal
             visible={showDeliveryFeedback}
             title="상품/앱 사용은 어떠셨나요?"
             description="배송 및 상품 품질, 앱 사용성에 대해 평가해 주세요."
-            onClose={() => setShowDeliveryFeedback(false)}
+            onClose={async () => {
+            setShowDeliveryFeedback(false);
+            // ✅ 닫기만 해도 해당 주문은 다시 안 뜨도록 플래그 저장
+            // (같은 주문에서 반복 노출 방지. “매번” = 매 ‘배송완료 주문’마다 1회)
+            try {
+                if (deliveredOrderId) {
+                await AsyncStorage.setItem(`feedback_delivery_${deliveredOrderId}`, '1');
+                }
+            } catch (e) {
+                console.warn('feedback_delivery flag 저장 실패(onClose):', e);
+            }
+            }}
+            onCancel={async () => {
+            // ※ onClose에서 이미 처리하므로 별도 로직 불필요
+            }}
             onSubmit={async (rating, comment) => {
             try {
                 const payload = {
-                user_id: Number(userId) || 1,     // 로그인 연동 전 임시
-                order_id: deliveredOrderId,       // 배송완료 주문 ID
-                type: '배송완료',                  // 트리거 2 고정
-                rating,                           // 'b' | 'q'
+                user_id: Number(userId) || 1, // 로그인 연동 전 임시
+                order_id: deliveredOrderId,
+                type: '배송완료',
+                rating,        // 'b' | 'q'
                 comment,
                 };
                 await axios.post(`${SERVER_DOMAIN}/api/feedback`, payload);
-                // ▶︎ 중복 방지 플래그 저장
+                // ✅ 제출 성공 시에도 해당 주문은 재노출 금지
                 await AsyncStorage.setItem(`feedback_delivery_${deliveredOrderId}`, '1');
             } catch (e) {
                 console.warn('배송완료 피드백 저장 실패:', e?.response?.data || e.message);
+            } finally {
+                setShowDeliveryFeedback(false);
             }
             }}
         />

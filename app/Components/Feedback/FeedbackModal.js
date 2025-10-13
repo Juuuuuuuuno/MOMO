@@ -1,6 +1,5 @@
 // app/Components/Feedback/FeedbackModal.js
-// ✔️ 공용 피드백 모달 (rating: 'b' | 'q'로 저장, UI는 👍/👎 표시)
-// ✔️ 스타일은 분리: app/Styles/FeedbackModalStyle.js
+
 import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, TextInput } from 'react-native';
 import styles from './FeedbackModalStyle';
@@ -10,23 +9,28 @@ export default function FeedbackModal({
     title = '피드백을 남겨주세요',
     description = '간단한 의견도 큰 도움이 됩니다.',
     onSubmit,   // (rating, comment) => Promise<void> | void
-    onClose,    // 닫기 콜백
+    onClose,    // 모달 닫기 공용
+    onCancel,   // ✨ 추가: "제출 없이 닫기" 전용 콜백 (스누즈 등)
     }) {
-    // ▶︎ 선택된 평가값: 'b'(👍) 또는 'q'(👎)
-    const [rating, setRating] = useState(null);
-    // ▶︎ 코멘트(선택 입력)
-    const [comment, setComment] = useState('');
+    const [rating, setRating] = useState(null);  // 'b' | 'q'
+    const [comment, setComment] = useState('');  // 선택 입력
 
+    // 👍 / 👎 선택 처리
     const handleSelect = (val) => setRating(val);
 
+    // 제출 처리
     const handleSubmit = async () => {
-        // ▶︎ 유효성: rating 필수
-        if (!rating) return;
+        if (!rating) return; // 선택 필수
         await onSubmit?.(rating, comment.trim());
-        // ▶︎ 제출 후 초기화
         setRating(null);
         setComment('');
-        onClose?.();
+        onClose?.(); // 제출 후 닫기
+    };
+
+    // 닫기(제출 없이)
+    const handleClose = () => {
+        onCancel?.(); // 부모에게 "제출 없이 닫힘" 알림 (스누즈 등)
+        onClose?.();  // 모달 닫기
     };
 
     return (
@@ -36,7 +40,7 @@ export default function FeedbackModal({
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.desc}>{description}</Text>
 
-            {/* ▶︎ 평가 선택 (DB: b/q, UI: 👍/👎) */}
+            {/* 👍 / 👎 선택 */}
             <View style={styles.row}>
                 <TouchableOpacity
                 style={[styles.choice, rating === 'b' && styles.choiceActive]}
@@ -52,7 +56,7 @@ export default function FeedbackModal({
                 </TouchableOpacity>
             </View>
 
-            {/* ▶︎ 간단 의견 입력 (선택) */}
+            {/* 텍스트 입력(선택) */}
             <TextInput
                 style={styles.input}
                 placeholder="간단한 의견을 적어주세요 (선택)"
@@ -61,9 +65,9 @@ export default function FeedbackModal({
                 multiline
             />
 
-            {/* ▶︎ 버튼 영역 */}
+            {/* 하단 버튼 */}
             <View style={styles.btnRow}>
-                <TouchableOpacity style={[styles.btn, styles.btnGhost]} onPress={onClose}>
+                <TouchableOpacity style={[styles.btn, styles.btnGhost]} onPress={handleClose}>
                 <Text style={[styles.btnText, { color: '#666' }]}>닫기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

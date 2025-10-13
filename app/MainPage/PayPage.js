@@ -1,4 +1,4 @@
-//app/MainPage/PayPage.js
+// app/MainPage/PayPage.js
 import React, { useEffect } from 'react';
 import { View, Text, Modal, Pressable } from 'react-native';
 import DoubleButtonRowIndividualDisable from '../Components/Button/DoubleButtonRowIndividualDisable';
@@ -12,6 +12,11 @@ import { SERVER_DOMAIN } from '@env';
 // ✅ 추가: 피드백 모달 & axios
 import FeedbackModal from '../Components/Feedback/FeedbackModal';
 import axios from 'axios';
+
+// ✅ 추가: 피드백(A, 주문과정) 노출 정책
+// 최초 1회 + 4주(28일) 쿨타임 후 재노출
+const FEEDBACK_A_MODE = 'first_plus_cooldown'; // 'first_only'면 최초 1회만
+const FEEDBACK_A_COOLDOWN_DAYS = 28;           // 4주 쿨타임
 
 const PayPage = () => {
     const route = useRoute();
@@ -28,27 +33,24 @@ const PayPage = () => {
         orderNumber,
         deadline,
     } = route.params;
-    const [canClose, setCanClose] = useState(false); //닫기 버튼 상태
-    const [canSubmit, setCanSubmit] = useState(true); // 입금완료 버튼 상태
+    const [canClose, setCanClose] = useState(false);   //닫기 버튼 상태
+    const [canSubmit, setCanSubmit] = useState(true);  //입금완료 버튼 상태
 
     const [modalVisible, setModalVisible] = useState(false);
-
     const router = useRouter();
-
     const [userId, setUserId] = useState(null);
 
     // ✅ 추가: 피드백 모달 상태 (구매과정)
     const [showFeedback, setShowFeedback] = useState(false);
-    // ✅ 추가: 주문 저장 후 응답받은 order_id 저장
-    const [lastOrderId, setLastOrderId] = useState(null);
+    const [lastOrderId, setLastOrderId] = useState(null); // 주문 ID 저장
 
-    //장바구니 목록
+    // 장바구니 목록
     const cartData = route.params.cart ? JSON.parse(route.params.cart) : null;
 
     useEffect(() => {
         const fetchUserId = async () => {
         const storedId = await AsyncStorage.getItem('user_id');
-        setUserId(Number(storedId)); // 반드시 숫자로 변환
+        setUserId(Number(storedId));
         };
         fetchUserId();
     }, []);
@@ -91,17 +93,14 @@ const PayPage = () => {
             rightDisabled={!canSubmit}
             onLeftPress={() => {
             if (canClose) router.replace('MainPage/ProductList');
-            //router.replace('MainPage/ProductList');
             }}
             onRightPress={() => {
             if (canSubmit) setModalVisible(true);
             }}
         />
-        <Modal
-            transparent
-            visible={modalVisible}
-            animationType="fade"
-        >
+
+        {/* ✅ 입금완료 모달 */}
+        <Modal transparent visible={modalVisible} animationType="fade">
             <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
                 <Text style={styles.modalTitle}>입금 확인 알림을 전송했습니다.</Text>
@@ -126,37 +125,29 @@ const PayPage = () => {
                         total_price: totalPrice,
                         status: '입금대기',
                         order_number: orderNumber,
-                        items: Array.isArray(cartData) && cartData.length > 0
+                        items:
+                            Array.isArray(cartData) && cartData.length > 0
                             ? cartData
-                            .filter(item => item.product_id)
-                            .map((item) => ({
-                                product_id: item.product_id,
-                                quantity: item.quantity,
-                                price_each: Number(item.price),
-                            }))
+                                .filter((item) => item.product_id)
+                                .map((item) => ({
+                                    product_id: item.product_id,
+                                    quantity: item.quantity,
+                                    price_each: Number(item.price),
+                                }))
                             : [
-                            {
-                                product_id: Number(product_id),
-                                quantity: Number(quantity),
-                                price_each: Number(price),
-                            },
-                            ],
+                                {
+                                    product_id: Number(product_id),
+                                    quantity: Number(quantity),
+                                    price_each: Number(price),
+                                },
+                                ],
                         }),
                     });
-                    console.log('✅ 보낼 상품 : ', product_id)
-                    console.log('🧾 보낼 items: ', Array.isArray(cartData) && cartData.length > 0
-                        ? '장바구니 주문' : [{
-                        product_id: Number(product_id),
-                        quantity: Number(quantity),
-                        price_each: Number(price)
-                        }]);
 
                     const data = await res.json();
 
                     if (res.ok) {
-                        console.log('✅ 주문 저장 성공:', data);
-
-                        // ✅ 문자 발송 요청
+                        // ✅ 문자 발송
                         await fetch(`${SERVER_DOMAIN}/api/send-payment-alert`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -166,20 +157,44 @@ const PayPage = () => {
                             totalPrice,
                             quantity,
                             user_id: userId,
-                            orderId: data.order_id
+                            orderId: data.order_id,
                         }),
                         });
 
-                        await AsyncStorage.removeItem('cart'); // ✅ 장바구니 초기화
-
-                        setCanSubmit(false); //입금완료 비활성화
+                        await AsyncStorage.removeItem('cart');
+                        setCanSubmit(false);
                         setModalVisible(false);
-                        setCanClose(true); //닫기 활성화
+                        setCanClose(true);
 
-                        // ✅ 추가: 결제 과정 피드백 모달 표시
-                        setLastOrderId(data.order_id);      // 서버에서 받은 주문 id 저장
-                        setShowFeedback(true);              // 피드백 모달 띄우기
+                        // ✅ A 피드백 (최초 1회 + 4주 쿨타임)
+                        try {
+                        const firstKey = `fbA_first_${userId}`;
+                        const lastKey = `fbA_last_shown_${userId}`;
+                        const firstShown = await AsyncStorage.getItem(firstKey);
+                        const lastShown = Number((await AsyncStorage.getItem(lastKey)) || '0');
+                        const now = Date.now();
+                        const cooldownMs = FEEDBACK_A_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
 
+                        let shouldShow = false;
+
+                        if (!firstShown) {
+                            shouldShow = true;
+                        } else if (FEEDBACK_A_MODE === 'first_plus_cooldown') {
+                            if (now - lastShown >= cooldownMs) {
+                            shouldShow = true;
+                            }
+                        }
+
+                        if (shouldShow) {
+                            setLastOrderId(data.order_id);
+                            setShowFeedback(true);
+                            if (!firstShown) {
+                            await AsyncStorage.setItem(firstKey, '1');
+                            }
+                        }
+                        } catch (freqErr) {
+                        console.warn('피드백 빈도 로직 오류:', freqErr);
+                        }
                     } else {
                         console.error('❌ 주문 저장 실패:', data.message);
                         alert('주문 저장에 실패했습니다.');
@@ -192,26 +207,36 @@ const PayPage = () => {
                 >
                 <Text style={styles.modalButtonText}>확인</Text>
                 </Pressable>
-
             </View>
             </View>
         </Modal>
 
-        {/* ✅ 추가: 결제 직후(구매과정) 피드백 모달 */}
+        {/* ✅ 결제 직후(구매과정) 피드백 모달 */}
         <FeedbackModal
             visible={showFeedback}
             title="결제까지 과정은 어떠셨나요?"
             description="상품 선택부터 결제 완료까지의 경험을 평가해 주세요."
-            onClose={() => setShowFeedback(false)}
+            onClose={async () => {
+            setShowFeedback(false);
+            try {
+                if (userId) {
+                await AsyncStorage.setItem(`fbA_last_shown_${userId}`, String(Date.now()));
+                }
+            } catch (e) {
+                console.warn('fbA_last_shown 저장 실패:', e);
+            }
+            }}
+            onCancel={() => {
+            // A는 별도 스누즈 없음
+            }}
             onSubmit={async (rating, comment) => {
             try {
-                // ⚠️ 로그인 연동 전까지 userId가 없으면 1 사용(요구사항 메모 반영)
                 const payload = {
                 user_id: Number(userId) || 1,
                 order_id: lastOrderId,
                 type: '구매과정',
-                rating,        // 'b' | 'q'
-                comment,       // 선택
+                rating,
+                comment,
                 };
                 await axios.post(`${SERVER_DOMAIN}/api/feedback`, payload);
             } catch (e) {
