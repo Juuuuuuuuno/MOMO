@@ -19,6 +19,7 @@ if (!fs.existsSync(uploadsDir)) {
 // ✅ 미들웨어 설정
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
+app.use(requestQueue);
 
 // ✅ 정적 파일 경로 설정 (uploads 폴더 접근 허용)
 app.use('/uploads', express.static(uploadsDir));
@@ -46,13 +47,82 @@ const db = mysql.createConnection({
 */
 
 
-db.connect(err => {
+db.getConnection((err,conn) => {
     if (err) {
         console.error('MySQL 연결 오류:', err);
         return;
     }
     console.log('MySQL 연결 성공!');
+    conn.release()
 });
+
+// ✅ API 이용 대기열
+// 동시 처리 최대치
+const MAX_CONCURRENT = 10;
+
+// 현재 처리 중인 개수 & 대기열 큐
+let activeCount = 0;
+const waitQueue = [];
+
+// 공용 타임스탬프
+const ts = () => new Date().toISOString();
+
+// 대기열 다음 처리
+function runNext() {
+    if (activeCount >= MAX_CONCURRENT) return;
+    const next = waitQueue.shift();
+    if (!next) return;
+    activeCount++;
+    next();
+}
+
+    /**
+     * 전역 요청 대기열 미들웨어
+     * - activeCount가 10 미만이면 즉시 처리
+     * - 10 이상이면 대기열에 push 후, 슬롯이 비면 순서대로 처리
+     * - 콘솔 로그: 입장/퇴장/종료
+     */
+
+function requestQueue(req, res, next) {
+    const userId = req.body?.user_id || req.query?.user_id || 'unknown';
+    const reqPath = req.path; // <- 충돌 방지
+
+    // 대기열에서 실제 처리가 시작되는 순간(=퇴장)
+    const startHandling = () => {
+        console.log(`[${ts()}] user가 대기열 퇴장 | user_id=${userId} | path=${reqPath} | active=${activeCount}/${MAX_CONCURRENT}`);
+
+        const startedAt = Date.now();
+        res.on('finish', () => {
+        // 요청 처리 종료
+        activeCount--;
+        const dur = Date.now() - startedAt;
+        console.log(`[${ts()}] 요청 종료 | user_id=${userId} | path=${reqPath} | status=${res.statusCode} | duration=${dur}ms | active=${activeCount}/${MAX_CONCURRENT}`);
+        runNext();
+        });
+
+        //중간에 끊고 나가는거 대비
+        res.on('close', () => {
+            if (res.writableEnded) return; // 이미 finish에서 처리
+            activeCount = Math.max(0, activeCount - 1);
+            console.log(`[${ts()}] 요청 중단 | path=${reqPath} | active=${activeCount}/${MAX_CONCURRENT}`);
+            runNext();
+        });
+
+        next();
+    };
+
+    // 즉시 처리 가능
+    if (activeCount < MAX_CONCURRENT) {
+        activeCount++;
+        console.log(`[${ts()}] 즉시 처리 | path=${reqPath} | active=${activeCount}/${MAX_CONCURRENT}`);
+        return startHandling();
+    }
+
+    // 대기열 입장
+    waitQueue.push(startHandling);
+    console.log(`[${ts()}] user가 대기열 입장 | user_id=${userId} | path=${reqPath} | queue_len=${waitQueue.length}`);
+}
+
 
 // ✅ 일반 상품 추가 (image_url 직접 받는 경우)
 app.post('/api/add-product', (req, res) => {
@@ -183,7 +253,8 @@ app.post('/api/orders', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const now = new Date();
+    //const now = new Date();
+    
     const orderValues = [
         user_id,
         recipient,
@@ -658,6 +729,7 @@ app.get('/api/user-orders/:userId', (req, res) => {
 
     const sql = `
         SELECT 
+            o.id AS order_id,
             oi.id AS order_item_id,
             o.order_number,
             o.created_at,
@@ -844,6 +916,45 @@ app.post('/api/update-order-status', (req, res) => {
     });
 });
 
+// ✅ feedback 받기 👍=b 👎=q
+app.post('/api/feedback', (req, res) => {
+    try {
+        const { user_id, order_id, type, rating, comment } = req.body;
+
+        // 1) 유효성 검사
+        const validType = type === '구매과정' || type === '배송완료';
+        const validRating = rating === 'b' || rating === 'q';
+        if (!user_id || !order_id || !validType || !validRating) {
+        return res.status(400).json({ message: 'invalid payload' });
+        }
+
+        // 2) 로그 출력 (코멘트는 100자까지만)
+        const shortComment = (comment || '').toString().slice(0, 100);
+        console.log(
+        `[${ts()}] user가 피드백 작성 | user_id=${user_id} | order_id=${order_id} | type=${type} | rating=${rating} | comment="${shortComment}${(comment||'').length>100 ? '…' : ''}"`
+        );
+
+        // 3) 저장 쿼리
+        const sql = `
+        INSERT INTO feedback (user_id, order_id, type, rating, comment, created_at)
+        VALUES (?, ?, ?, ?, ?, NOW())
+        `;
+        const params = [user_id, order_id, type, rating, comment || null];
+
+        // ⚠️ db 커넥션은 기존에 사용하시던 변수명(db/pool) 그대로 사용하세요.
+        // 예) const db = require('./db');  또는  const db = mysql.createPool({...});
+        db.query(sql, params, (err, result) => {
+        if (err) {
+            console.error(`[${ts()}] ❌ 피드백 저장 실패:`, err);
+            return res.status(500).json({ message: 'db error' });
+        }
+        return res.status(200).json({ success: true, feedback_id: result.insertId });
+        });
+    } catch (e) {
+        console.error(`[${ts()}] ❌ 피드백 처리 오류:`, e);
+        return res.status(500).json({ message: 'server error' });
+    }
+});
 
 
 // ✅ 서버 시작 + 타임아웃 설정
