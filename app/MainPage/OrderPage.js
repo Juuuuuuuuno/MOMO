@@ -174,7 +174,7 @@ export default function OrderPage() {
                         ))
                     ) : (
                         <View style={[styles.productBox, { marginBottom: 12 }]}>
-                            <Image source={{ uri: `${SERVER_DOMAIN}${image_url}` }} style={styles.productImage} />
+                            <Image source={{ uri: `${SERVER_DOMAIN}1${image_url}` }} style={styles.productImage} />
                             <View style={styles.productInfo}>
                                 <Text style={styles.productName}>{name}</Text>
                                 <View style={styles.productInfoRow}>
