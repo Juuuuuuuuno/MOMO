@@ -1,6 +1,15 @@
 //app/admin/ProductDetail.js
 import React, { useState } from 'react';
-import { View,    Text,    Image,    SafeAreaView,    ScrollView,    StyleSheet,    TouchableOpacity,    Alert} from 'react-native';
+import {
+    View,
+    Text,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    Alert
+} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import BackButton from '../Components/Button/BackButton';
