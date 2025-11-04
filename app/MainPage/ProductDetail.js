@@ -1,156 +1,165 @@
-// app/MainPage/ProductDetail.js
+//app/MainPage/ProductDetail.js
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { Image } from 'expo-image'; // ✅ expo-image 사용
+import { View, Text, Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
 import DoubleButtonRowDisable from '../Components/Button/DoubleButtonRowDisable';
 import styles from '../Styles/ProductDetailStyle';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_DOMAIN } from '@env';
 
 export default function ProductDetail() {
-  const router = useRouter();
-  const { product_id, name, price, image_url } = useLocalSearchParams(); // ProductList에서 전달됨
+    const router = useRouter();
+    const { product_id, name, price, image_url } = useLocalSearchParams(); // ProductList에서 전달됨
 
-  const [quantity, setQuantity] = useState(1); // ✅ 누락 보완
-  const getDeliveryFee = (q) => (q === 1 ? 5000 : 6000);
-  const isOverWeight = (q) => (q * 4.5) >= 20; // 4.5kg * 수량 >= 20kg
+    const [quantity, setQuantity] = useState(1); // ✅ 이 줄이 누락됨
+    const getDeliveryFee = (quantity) => {
+    return quantity === 1 ? 5000 : 6000;
+    };
 
-  const parsedPrice = Number(price);
-  const parsedQuantity = Number(quantity);
-  const deliveryFee = getDeliveryFee(parsedQuantity);
-  const totalPrice = parsedPrice * parsedQuantity + deliveryFee;
-  const overweight = isOverWeight(parsedQuantity);
+    const isOverWeight = (quantity) => {
+    const weightPerUnit = 4.5; // kg
+    return (quantity * weightPerUnit) >= 20;
+    };
 
-  const increase = () => setQuantity(prev => prev + 1);
-  const decrease = () => setQuantity(prev => Math.max(1, prev - 1));
+    const parsedPrice = Number(price);
+    const parsedQuantity = Number(quantity);
+    const deliveryFee = getDeliveryFee(parsedQuantity);
+    const totalPrice = parsedPrice * parsedQuantity + deliveryFee;
+    const overweight = isOverWeight(parsedQuantity);
 
-  return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <SafeAreaView style={styles.safeArea}>
-        {/* 상단 헤더 */}
-        <View style={styles.headerRow}>
-          <BackButton onPress={() => router.back()} />
-          <Text style={styles.headerTitle}>상품 구매</Text>
-          <View style={styles.iconGroup}>
-            <IconButton iconSource={require('../../assets/15050.png')} onPress={() => { router.push('/MainPage/ShoppingCart'); }} />
-          </View>
-        </View>
 
-        {/* 본문 */}
-        <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom: 200 }]}>
-          <Image
-            source={{ uri: image_url?.startsWith('http') ? image_url : `${SERVER_DOMAIN}${image_url}` }}
-            cachePolicy="disk"
-            contentFit="cover"
-            transition={200}
-            style={styles.image}
-          />
 
-          <Text style={styles.productName}>{name}</Text>
-          <Text style={styles.price}>
-            ₩{Number(price).toLocaleString()} <Text style={styles.deliveryIncluded}>배송비 미포함</Text>
-          </Text>
+    const increase = () => setQuantity(prev => prev + 1);
+    const decrease = () => setQuantity(prev => Math.max(1, prev - 1));
 
-          {/* 안내문구 */}
-          <View style={styles.descriptionBox}>
-            <Text style={styles.bullet}>※ 복숭아는 수확 직후 딱딱한 상태로 배송되며, 보관 상태에 따라 말랑해집니다.</Text>
-            <Text style={styles.bullet}>※ 상품에 문제가 있을 시 010-3462-3100에 문의 주세요.</Text>
-            <Text style={styles.bullet}>농장 직송 우체국 택배 2~3일 후 도착</Text>
-            <Text style={styles.bullet}>판매자 : 참농원 (이재석)</Text>
-          </View>
-        </ScrollView>
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+            >
+                <SafeAreaView style={styles.safeArea}>
+                    {/* 상단 헤더 */}
+                    <View style={styles.headerRow}>
+                        <BackButton onPress={() => router.back()} />
+                        <Text style={styles.headerTitle}>상품 구매</Text>
+                        <View style={styles.iconGroup}>
+                            <IconButton iconSource={require('../../assets/15050.png')} onPress={() => { router.push('/MainPage/ShoppingCart')}} />
+                        </View>
+                    </View>
 
-        {/* 하단 고정 영역 */}
-        <View style={styles.fixedBottom}>
-          {/* 가격/수량/합계 */}
-          <View style={styles.priceBox}>
-            <View style={styles.row}>
-              <Text style={styles.label}>{name}</Text>
-              <Text style={styles.value}>₩{Number(price).toLocaleString()}</Text>
-            </View>
+                    {/* 본문 */}
+                    <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom : 200 }]}>
+                        <Image source={{ uri: `${SERVER_DOMAIN}${image_url}` }} style={styles.image} />
 
-            <View style={styles.row}>
-              <View style={styles.quantityBox}>
-                <TouchableOpacity onPress={decrease} style={styles.quantityButton}>
-                  <Text style={styles.quantityText}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.quantityNumber}>{quantity}</Text>
-                <TouchableOpacity onPress={increase} style={styles.quantityButton}>
-                  <Text style={styles.quantityText}>+</Text>
-                </TouchableOpacity>
+                        <Text style={styles.productName}>{name}</Text>
+                        <Text style={styles.price}>
+                            ₩{Number(price).toLocaleString()} <Text style={styles.deliveryIncluded}>배송비 미포함</Text>
+                        </Text>
 
-                {/* 중량 초과시 안내 */}
-                {overweight && (
-                  <Text style={[styles.overweightWarning, { flex: 1, flexWrap: 'wrap' }]}>
-                    총 중량이 20kg을 초과하여 배송이 불가합니다.
-                  </Text>
-                )}
-              </View>
 
-              {/* 중량 초과가 아닐 때만 배송비/총액 표시 */}
-              {!overweight && (
-                <View>
-                  <Text style={styles.label2}>배송비: ₩{deliveryFee.toLocaleString()}</Text>
-                  <Text style={styles.total}>총 {totalPrice.toLocaleString()}원</Text>
-                </View>
-              )}
-            </View>
-          </View>
 
-          <DoubleButtonRowDisable
-            leftLabel="장바구니 담기"
-            rightLabel="바로구매"
-            onLeftPress={async () => {
-              console.log('🛒 장바구니 담기');
-              try {
-                const existing = await AsyncStorage.getItem('cart');
-                const prevItems = existing ? JSON.parse(existing) : [];
+                        {/* 안내문구 */}
+                        <View style={styles.descriptionBox}>
+                            <Text style={styles.bullet}>※ 복숭아는 수확 직후 딱딱한 상태로 배송되며, 보관 상태에 따라 말랑해집니다.</Text>
+                            <Text style={styles.bullet}>※ 상품에 문제가 있을 시 010-3462-3100에 문의 주세요.</Text>
+                            <Text style={styles.bullet}>농장 직송 우체국 택배 2~3일 후 도착</Text>
+                            <Text style={styles.bullet}>판매자 : 참농원 (이재석)</Text>
+                        </View>
+                    </ScrollView>
 
-                const newItem = {
-                  product_id,
-                  name,
-                  price: Number(price),
-                  // ✅ 절대/상대 URL 모두 안전하게 저장 (중복 프리픽스 방지)
-                  image_url: image_url?.startsWith('http') ? image_url : `${SERVER_DOMAIN}${image_url}`,
-                  quantity,
-                  deliveryFee,
-                };
+                    {/* 하단 고정 버튼 */}
+                    <View style={styles.fixedBottom}>
+                        {/* 💡 상품 가격/수량/합계 */}
+                        <View style={styles.priceBox}>
+                            <View style={styles.row}>
+                                <Text style={styles.label}>{name}</Text>
+                                <Text style={styles.value}>₩{Number(price).toLocaleString()}</Text>
+                            </View>
 
-                const index = prevItems.findIndex(item => item.name === name);
-                if (index > -1) {
-                  prevItems[index].quantity += quantity; // 기존 상품이면 수량 증가
-                  await AsyncStorage.setItem('cart', JSON.stringify(prevItems));
-                } else {
-                  const updated = [...prevItems, newItem];
-                  await AsyncStorage.setItem('cart', JSON.stringify(updated));
-                }
+                            <View style={styles.row}>
+                                <View style={styles.quantityBox}>
+                                <TouchableOpacity onPress={decrease} style={styles.quantityButton}>
+                                    <Text style={styles.quantityText}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.quantityNumber}>{quantity}</Text>
+                                <TouchableOpacity onPress={increase} style={styles.quantityButton}>
+                                    <Text style={styles.quantityText}>+</Text>
+                                </TouchableOpacity>
 
-                Alert.alert('알림', '장바구니에 상품을 담았습니다.');
-              } catch (e) {
-                console.error('장바구니 저장 오류:', e);
-              }
-            }}
-            onRightPress={() => {
-              console.log('✅ 바로구매');
-              router.push({
-                pathname: 'MainPage/OrderPage',
-                params: {
-                  product_id,
-                  name,
-                  price,
-                  image_url,
-                  quantity,
-                  deliveryFee,
-                }
-              });
-            }}
-            disabled={overweight} // ✅ 중량 초과 시 버튼 비활성화
-          />
-        </View>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
-  );
+                                {/* 중량 초과시 택배 불가 */}
+                                {overweight && (
+                                    <Text style={[styles.overweightWarning, {flex:1, flexWrap:'wrap'}]}>
+                                    총 중량이 20kg을 초과하여 배송이 불가합니다.
+                                    </Text>
+                                )}
+                                </View>
+
+                                {/* 중량 초과가 아닐 경우만 배송비/총 가격 표시 */}
+                                {!overweight && (
+                                <View>
+                                    <Text style={styles.label2}>배송비: ₩{deliveryFee.toLocaleString()}</Text>
+                                    <Text style={styles.total}>총 {totalPrice.toLocaleString()}원</Text>
+                                </View>
+                                )}
+                            </View>
+                        </View>
+
+                        <DoubleButtonRowDisable
+                            leftLabel="장바구니 담기"
+                            rightLabel="바로구매"
+                            onLeftPress={async () => {
+                                console.log('🛒 장바구니 담기');
+                                try {
+                                        const existing = await AsyncStorage.getItem('cart');
+                                        const prevItems = existing ? JSON.parse(existing) : [];
+
+                                        const newItem = {
+                                            product_id,
+                                            name,
+                                            price: Number(price),
+                                            image_url: `${SERVER_DOMAIN}${image_url}`, // 전체 URL로 저장
+                                            quantity,
+                                            deliveryFee,
+                                        };
+
+                                        const index = prevItems.findIndex(item => item.name === name);
+                                        if (index > -1) {
+                                            // ✅ 기존 상품이면 수량 증가
+                                            prevItems[index].quantity += quantity;
+                                            await AsyncStorage.setItem('cart', JSON.stringify(prevItems));
+                                        } else {
+                                            const updated = [...prevItems, newItem];
+                                            await AsyncStorage.setItem('cart', JSON.stringify(updated));
+                                        }
+
+                                        Alert.alert('알림', '장바구니에 상품을 담았습니다.');
+                                    } catch (e) {
+                                        console.error('장바구니 저장 오류:', e);
+                                    }
+                                }}
+
+                            onRightPress={() => {
+                                console.log('✅ 바로구매');
+                                router.push({
+                                    pathname : 'MainPage/OrderPage',
+                                    params: {
+                                        product_id,
+                                        name,
+                                        price,
+                                        image_url,
+                                        quantity,
+                                        deliveryFee,
+                                    }
+                                })
+                            }}
+                            disabled={overweight} // ✅ 중량 초과 시 버튼 비활성화
+                        />
+                    </View>
+                </SafeAreaView>
+        </KeyboardAvoidingView>
+    );
 }
