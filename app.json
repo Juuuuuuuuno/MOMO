@@ -4,11 +4,16 @@
     "slug": "MOMO",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web"],
-    "assetBundlePatterns": ["**/*"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "jsEngine": "hermes",
     "scheme": "momo",
-
     "ios": {
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -21,6 +26,14 @@
           }
         }
       }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "30b70b48-7e35-4ce3-88b0-f4ec91fbf269"
+      }
+    },
+    "android": {
+      "package": "com.juuuuuuno.MOMO"
     }
   }
 }
