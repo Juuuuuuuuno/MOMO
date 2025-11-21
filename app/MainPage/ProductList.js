@@ -45,7 +45,7 @@ export default function ProductList() {
                 })
             }
         >
-            <Image source={{ uri: `${SERVER_DOMAIN}${item.image_url}` }} style={styles.productImage} />
+            <Image source={{ uri: `${SERVER_DOMAIN}${item.image_url}` }} style={styles.productImage}resizeMode="cover"  /*✅ 비율 유지*/ />
             <View style={styles.infoRow}>
                 <Text style={styles.productName}>{item.name}</Text>
                 <Text style={styles.productPrice}>₩{item.price.toLocaleString()}</Text>
@@ -62,17 +62,57 @@ export default function ProductList() {
                 <View style={{ width: 70 }}>
                     <BackButton onPress={()=>{
                         if (from === 'adminAdd') {
-                        router.replace('/admin/Home'); // 👈 어드민 추가 후 복귀는 홈으로
+                            router.replace('/admin/Home'); // 어드민 추가 후 복귀는 홈으로
                         } else {
-                            router.back(); // 👈 일반 사용자는 원래대로
+                            router.back(); // 일반 사용자는 원래대로
                         }
                     }} />
                 </View>
+
                 <Text style={styles.headerTitle}>상품 목록</Text>
+
                 <View style={styles.iconGroup}>
-                    <IconButton iconSource={require('../../assets/receipt.png')} onPress={() => { router.push('/MainPage/ProductCheck'), console.log("🧾 주문목록")}} />
-                    <IconButton iconSource={require('../../assets/15050.png')} onPress={() => { router.push('/MainPage/ShoppingCart'), console.log("🛒 장바구니")}} />
+                    {isAdmin ? (
+                        <>
+                            
+                            {/* ✅ 첫 번째 아이콘: 자리만 채우는 null.png (onPress 없음) */}
+                            <IconButton
+                                iconSource={require('../../assets/null.png')} // 투명 이미지
+                                onPress={() => { /* 자리 맞추기용, 동작 없음 */ }}
+                            />
+
+                            {/* ✅ 어드민: 두 번째 아이콘은 피드백 리스트 */}
+                            <IconButton
+                                iconSource={require('../../assets/receipt.png')}
+                                onPress={() => {
+                                    router.push('/admin/FeedbackList');
+                                    console.log('📝 피드백 리스트');
+                                }}
+                            />
+
+
+                        </>
+                    ) : (
+                        <>
+                            {/* 일반 유저: 주문목록 + 장바구니 기존 그대로 */}
+                            <IconButton
+                                iconSource={require('../../assets/receipt.png')}
+                                onPress={() => {
+                                    router.push('/MainPage/ProductCheck'),
+                                    console.log('🧾 주문목록');
+                                }}
+                            />
+                            <IconButton
+                                iconSource={require('../../assets/15050.png')}
+                                onPress={() => {
+                                    router.push('/MainPage/ShoppingCart'),
+                                    console.log('🛒 장바구니');
+                                }}
+                            />
+                        </>
+                    )}
                 </View>
+
             </View>
 
             {/* 상품 목록 */}

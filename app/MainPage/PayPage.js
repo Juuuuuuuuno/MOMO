@@ -18,6 +18,9 @@ import axios from 'axios';
 const FEEDBACK_A_MODE = 'first_plus_cooldown'; // 'first_only'면 최초 1회만
 const FEEDBACK_A_COOLDOWN_DAYS = 28;           // 4주 쿨타임
 
+const [canClose, setCanClose] = useState(false);   // 닫기 버튼 상태
+const [canSubmit, setCanSubmit] = useState(true);  // 입금완료 버튼 상태
+
 const PayPage = () => {
     const route = useRoute();
     const {
@@ -99,115 +102,141 @@ const PayPage = () => {
             }}
         />
 
-        {/* ✅ 입금완료 모달 */}
+ {/* ✅ 입금완료 모달 */}
         <Modal transparent visible={modalVisible} animationType="fade">
             <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-                <Text style={styles.modalTitle}>입금 확인 알림을 전송했습니다.</Text>
-                <Text style={styles.modalContent}>예금주에게 입금 사실이 전달되었습니다.</Text>
-                <Pressable
-                style={styles.modalButton}
-                onPress={async () => {
-                    if (!userId) {
-                    alert('사용자 정보를 불러오고 있습니다. 잠시 후 다시 시도해 주세요.');
-                    return;
-                    }
-                    try {
-                    const res = await fetch(`${SERVER_DOMAIN}/api/orders`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                        user_id: userId,
-                        recipient,
-                        recipient_address: address,
-                        recipient_phone: phone,
-                        request_note: requestNote,
-                        total_price: totalPrice,
-                        status: '입금대기',
-                        order_number: orderNumber,
-                        items:
-                            Array.isArray(cartData) && cartData.length > 0
-                            ? cartData
-                                .filter((item) => item.product_id)
-                                .map((item) => ({
-                                    product_id: item.product_id,
-                                    quantity: item.quantity,
-                                    price_each: Number(item.price),
-                                }))
-                            : [
-                                {
-                                    product_id: Number(product_id),
-                                    quantity: Number(quantity),
-                                    price_each: Number(price),
-                                },
-                                ],
-                        }),
-                    });
+                <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>입금 확인 알림을 전송했습니다.</Text>
+                    <Text style={styles.modalContent}>예금주에게 입금 사실이 전달되었습니다.</Text>
 
-                    const data = await res.json();
-
-                    if (res.ok) {
-                        // ✅ 문자 발송
-                        await fetch(`${SERVER_DOMAIN}/api/send-payment-alert`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            orderNumber,
-                            name,
-                            totalPrice,
-                            quantity,
-                            user_id: userId,
-                            orderId: data.order_id,
-                        }),
-                        });
-
-                        await AsyncStorage.removeItem('cart');
-                        setCanSubmit(false);
-                        setModalVisible(false);
-                        setCanClose(true);
-
-                        // ✅ A 피드백 (최초 1회 + 4주 쿨타임)
-                        try {
-                        const firstKey = `fbA_first_${userId}`;
-                        const lastKey = `fbA_last_shown_${userId}`;
-                        const firstShown = await AsyncStorage.getItem(firstKey);
-                        const lastShown = Number((await AsyncStorage.getItem(lastKey)) || '0');
-                        const now = Date.now();
-                        const cooldownMs = FEEDBACK_A_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
-
-                        let shouldShow = false;
-
-                        if (!firstShown) {
-                            shouldShow = true;
-                        } else if (FEEDBACK_A_MODE === 'first_plus_cooldown') {
-                            if (now - lastShown >= cooldownMs) {
-                            shouldShow = true;
+                    <Pressable
+                        style={styles.modalButton}
+                        onPress={async () => {
+                            // ✅ 중복 주문 방지: 이미 처리 중이면 바로 종료
+                            if (!canSubmit) {
+                                return;
                             }
-                        }
 
-                        if (shouldShow) {
-                            setLastOrderId(data.order_id);
-                            setShowFeedback(true);
-                            if (!firstShown) {
-                            await AsyncStorage.setItem(firstKey, '1');
+                            // ✅ 첫 클릭에서 바로 비활성화해서 여러 번 눌러도 한 번만 처리
+                            setCanSubmit(false);
+
+                            if (!userId) {
+                                alert('사용자 정보를 불러오고 있습니다. 잠시 후 다시 시도해 주세요.');
+                                // 사용자 정보를 못 불러왔으면 다시 시도할 수 있게 복구
+                                setCanSubmit(true);
+                                return;
                             }
-                        }
-                        } catch (freqErr) {
-                        console.warn('피드백 빈도 로직 오류:', freqErr);
-                        }
-                    } else {
-                        console.error('❌ 주문 저장 실패:', data.message);
-                        alert('주문 저장에 실패했습니다.');
-                    }
-                    } catch (err) {
-                    console.error('❌ 주문 요청 오류:', err);
-                    alert('서버와 연결할 수 없습니다.');
-                    }
-                }}
-                >
-                <Text style={styles.modalButtonText}>확인</Text>
-                </Pressable>
-            </View>
+
+                            try {
+                                const res = await fetch(`${SERVER_DOMAIN}/api/orders`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        user_id: userId,
+                                        recipient,
+                                        recipient_address: address,
+                                        recipient_phone: phone,
+                                        request_note: requestNote,
+                                        total_price: totalPrice,
+                                        status: '입금대기',
+                                        order_number: orderNumber,
+                                        items:
+                                            Array.isArray(cartData) && cartData.length > 0
+                                                ? cartData
+                                                      .filter((item) => item.product_id)
+                                                      .map((item) => ({
+                                                          product_id: item.product_id,
+                                                          quantity: item.quantity,
+                                                          price_each: Number(item.price),
+                                                      }))
+                                                : [
+                                                      {
+                                                          product_id: Number(product_id),
+                                                          quantity: Number(quantity),
+                                                          price_each: Number(price),
+                                                      },
+                                                  ],
+                                    }),
+                                });
+
+                                const data = await res.json();
+
+                                if (res.ok) {
+                                    // ✅ 문자 발송
+                                    await fetch(`${SERVER_DOMAIN}/api/send-payment-alert`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            orderNumber,
+                                            name,
+                                            totalPrice,
+                                            quantity,
+                                            user_id: userId,
+                                            orderId: data.order_id,
+                                        }),
+                                    });
+
+                                    // ✅ 장바구니 비우기 + 모달 닫기 + 뒤로가기 허용
+                                    await AsyncStorage.removeItem('cart');
+                                    setModalVisible(false);
+                                    setCanClose(true);
+                                    // canSubmit은 false 유지 → 이 화면에서는 더 이상 중복 주문 불가
+
+                                    // ✅ A 피드백 (최초 1회 + 4주 쿨타임)
+                                    try {
+                                        const firstKey = `fbA_first_${userId}`;
+                                        const lastKey = `fbA_last_shown_${userId}`;
+                                        const firstShown = await AsyncStorage.getItem(firstKey);
+                                        const lastShown = Number(
+                                            (await AsyncStorage.getItem(lastKey)) || '0',
+                                        );
+                                        const now = Date.now();
+                                        const cooldownMs =
+                                            FEEDBACK_A_COOLDOWN_DAYS *
+                                            24 *
+                                            60 *
+                                            60 *
+                                            1000;
+
+                                        let shouldShow = false;
+
+                                        if (!firstShown) {
+                                            shouldShow = true;
+                                        } else if (
+                                            FEEDBACK_A_MODE === 'first_plus_cooldown'
+                                        ) {
+                                            if (now - lastShown >= cooldownMs) {
+                                                shouldShow = true;
+                                            }
+                                        }
+
+                                        if (shouldShow) {
+                                            setLastOrderId(data.order_id);
+                                            setShowFeedback(true);
+                                            if (!firstShown) {
+                                                await AsyncStorage.setItem(firstKey, '1');
+                                            }
+                                        }
+                                    } catch (freqErr) {
+                                        console.warn('피드백 빈도 로직 오류:', freqErr);
+                                    }
+                                } else {
+                                    console.error('❌ 주문 저장 실패:', data.message);
+                                    alert('주문 저장에 실패했습니다.');
+                                    // ✅ 실패 시 다시 누를 수 있도록 복구
+                                    setCanSubmit(true);
+                                }
+                            } catch (err) {
+                                console.error('❌ 주문 요청 오류:', err);
+                                alert('서버와 연결할 수 없습니다.');
+                                // ✅ 네트워크 오류 시에도 재시도 가능하도록 복구
+                                setCanSubmit(true);
+                            }
+                        }}
+                    >
+                        <Text style={styles.modalButtonText}>확인</Text>
+                    </Pressable>
+                </View>
             </View>
         </Modal>
 

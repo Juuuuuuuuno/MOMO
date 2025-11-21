@@ -107,7 +107,7 @@ export default function ShoppingCart() {
                     <Text style={styles.sectionTitle}>주문 상품</Text>
                     {cartItems.map((item, index) => (
                         <View key={index} style={styles.productBox}>
-                            <Image source={{ uri: item.image_url }} style={styles.productImage} />
+                            <Image source={{ uri: item.image_url }} style={styles.productImage} resizeMode='cover' /*짜부 방지*/ />
                             <View style={styles.productInfo}>
                                 <Text style={styles.productName}>{item.name}</Text>
                                 <View style={styles.productInfoRow}>
@@ -154,7 +154,8 @@ export default function ShoppingCart() {
                     label="구매하기"
                     onPress={() => {
                         console.log('💰 결제페이지 이동');
-                        router.push({
+                        // ✅ push → replace 변경 (스택에 ShoppingCart 안 남게)
+                        router.replace({
                             pathname: '/MainPage/OrderPage',
                             params: {
                                 cart: JSON.stringify(cartItems),

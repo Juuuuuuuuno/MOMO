@@ -221,32 +221,33 @@ export default function OrderPage() {
                 label="결제하기"
                 disabled={!agreed}
                 onPress={() => {
-                const today = new Date();
-                const deadline = new Date(today);
-                deadline.setDate(today.getDate() + 2);
-                deadline.setHours(23, 59, 0, 0);
+                    const today = new Date();
+                    const deadline = new Date(today);
+                    deadline.setDate(today.getDate() + 2);
+                    deadline.setHours(23, 59, 0, 0);
 
-                const yyyymmdd = today.toISOString().slice(0, 10).replace(/-/g, '');
-                const randomNum = Math.floor(Math.random() * 9000) + 1000;
-                const orderNumber = `${yyyymmdd}${randomNum}`;
+                    const yyyymmdd = today.toISOString().slice(0, 10).replace(/-/g, '');
+                    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+                    const orderNumber = `${yyyymmdd}${randomNum}`;
 
-                router.push({
-                    pathname: 'MainPage/PayPage',
-                    params: {
-                        orderNumber,
-                        requestNote,
-                        recipient,
-                        address,
-                        phone,
-                        cart: JSON.stringify(parsedCart), // ✅ 수정된 부분
-                        product_id,
-                        name,
-                        price,
-                        quantity,
-                        deliveryFee,
-                        totalPrice: isCart ? totalPriceCart : totalPriceSingle,
-                        deadline: deadline.toISOString().slice(0, 10) + ' 23:59',
-                    },
+                    // ✅ push → replace 변경 (스택에 OrderPage 안 남게)
+                    router.replace({
+                        pathname: 'MainPage/PayPage',
+                        params: {
+                            orderNumber,
+                            requestNote,
+                            recipient,
+                            address,
+                            phone,
+                            cart: JSON.stringify(parsedCart),
+                            product_id,
+                            name,
+                            price,
+                            quantity,
+                            deliveryFee,
+                            totalPrice: isCart ? totalPriceCart : totalPriceSingle,
+                            deadline: deadline.toISOString().slice(0, 10) + ' 23:59',
+                        },
                     });
                 }}
             />

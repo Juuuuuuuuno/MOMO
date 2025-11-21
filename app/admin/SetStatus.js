@@ -88,6 +88,7 @@ export default function SetStatus() {
                                     <Text style={styles.cell}>{details.status}</Text>
                                 </TouchableOpacity>
 
+
                                 {expandedOrder === order_number && (
                                     <View style={styles.expandedBox}>
                                         {details.items.map((product, idx) => (
@@ -101,19 +102,33 @@ export default function SetStatus() {
 
                                         <Text style={styles.expandedText}>주문자: {details.user_name}</Text>
 
-                                        {/* ✅ 총 금액 및 배송비 표시 */}
-                                        <Text style={styles.expandedText}>
-                                            총 금액: {details.total_price.toLocaleString()}원
-                                        </Text>
-                                        <Text style={styles.expandedText}>
-                                            배송비: {(
-                                                details.total_price -
-                                                details.items.reduce((sum, p) => sum + p.price_each * p.quantity, 0)
-                                            ).toLocaleString()}원
-                                        </Text>
+                                        {/* ✅ 총 금액 및 배송비: 사용자 화면과 동일한 규칙으로 재계산 */}
+                                        {(() => {
+                                            const productsTotal = details.items.reduce(
+                                                (sum, p) => sum + p.price_each * p.quantity,
+                                                0
+                                            );
+                                            const totalQuantity = details.items.reduce(
+                                                (sum, p) => sum + p.quantity,
+                                                0
+                                            );
+                                            const deliveryFee = totalQuantity <= 1 ? 5000 : 6000;
+                                            const totalPrice = productsTotal + deliveryFee;
+
+                                            return (
+                                                <>
+                                                    <Text style={styles.expandedText}>
+                                                        총 금액: {totalPrice.toLocaleString()}원
+                                                    </Text>
+                                                    <Text style={styles.expandedText}>
+                                                        배송비: {deliveryFee.toLocaleString()}원
+                                                    </Text>
+                                                </>
+                                            );
+                                        })()}
 
                                         <View style={styles.statusButtonRow}>
-                                            {['입금대기','배송중', '배송완료'].map((status) => (
+                                            {['입금대기', '배송중', '배송완료'].map((status) => (
                                                 <Pressable
                                                     key={status}
                                                     style={styles.statusButton}

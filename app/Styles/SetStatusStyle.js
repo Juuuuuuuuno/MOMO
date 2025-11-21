@@ -19,6 +19,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#000',
     },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
     statusFilterRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',

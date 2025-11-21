@@ -43,7 +43,7 @@ export default function AddProduct() {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.7,
         base64: true,
         });
 
