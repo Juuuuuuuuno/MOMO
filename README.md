@@ -1,7 +1,9 @@
 # MOMO
 
 ───────────────────────────────
+
 📘 프로그램명 : MOMO (농산물 주문 자동화 앱)
+
 ───────────────────────────────
 
 [1] 개발환경
@@ -48,14 +50,14 @@
 
 Android (APK 설치파일 포함)
 
-iOS : 추후 대응 예정
+iOS : 추후 대응 예정 (Expo GO로 실행 가능)
 
 실행 방법
 
 app 폴더 : React Native 프로젝트
 → npm install
 → npx expo start
-→ Android 기기 또는 Expo Go 앱에서 실행 가능
+→ Android, IOS 기기 또는 Expo Go 앱에서 실행 가능
 
 별도의 서버 설정 불필요
 → AWS 환경에서 이미 서버가 동작 중이므로 앱 실행 시 자동 연결됨
