@@ -4,12 +4,12 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router'; // 화면 이동을 위해 추가
 import styles from '../Styles/IntroStyle';
 import MainButton from '../Components/Button/MainButton';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 추가 : AsyncStorage 불러오기
 
 const Intro = () => {
   const router = useRouter(); // 라우터 인스턴스
-  console.log("📡 서버 도메인 : ", SERVER_DOMAIN)
+  console.log("📡 서버 도메인 : ", EXPO_PUBLIC_SERVER_DOMAIN)
 
   // ✅ 추가 : 자동 로그인 체크
   useEffect(() => {

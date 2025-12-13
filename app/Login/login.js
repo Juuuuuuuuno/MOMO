@@ -19,7 +19,7 @@ import { useRouter } from 'expo-router';
 import styles from '../Styles/IntroStyle';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function Login() {
   const [phone, setPhone] = useState('');
@@ -71,7 +71,7 @@ export default function Login() {
                   //console.log('📱 phone:', phone);
                   //console.log('🔑 password:', password);
                   try {
-                    const response = await axios.post(`${SERVER_DOMAIN}/api/login`, {
+                    const response = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/login`, {
                       phone,
                       pw: password
                     });
@@ -121,7 +121,7 @@ export default function Login() {
                         text: '확인',
                         onPress: async () => {
                           try {
-                            const res = await axios.post(`${SERVER_DOMAIN}/api/send-auth-code`, {
+                            const res = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/send-auth-code`, {
                               phone,
                             });
 

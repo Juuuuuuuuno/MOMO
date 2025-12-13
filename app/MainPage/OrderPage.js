@@ -15,7 +15,7 @@ import AgreementBox from '../Components/Agreement/AgreementBox';
 import AgreementModal from '../Components/Agreement/AgreementModal';
 import InputField from '../Components/InputField/InputField';
 import styles from '../Styles/OrderPageStyle';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 추가
 
 export default function OrderPage() {
@@ -174,7 +174,7 @@ export default function OrderPage() {
                         ))
                     ) : (
                         <View style={[styles.productBox, { marginBottom: 12 }]}>
-                            <Image source={{ uri: `${SERVER_DOMAIN}${image_url}` }} style={styles.productImage} />
+                            <Image source={{ uri: `${EXPO_PUBLIC_SERVER_DOMAIN}${image_url}` }} style={styles.productImage} />
                             <View style={styles.productInfo}>
                                 <Text style={styles.productName}>{name}</Text>
                                 <View style={styles.productInfoRow}>

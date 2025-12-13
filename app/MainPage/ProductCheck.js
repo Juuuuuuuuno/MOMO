@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../Styles/ProductCheckStyle';
 import BackButton from '../Components/Button/BackButton';
 import IconButton from '../Components/Button/IconButton';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 // ✅ 피드백 모달 & axios
 import FeedbackModal from '../Components/Feedback/FeedbackModal';
@@ -33,7 +33,7 @@ const ProductCheck = () => {
             if (storedId) {
                 setUserId(Number(storedId));
                 try {
-                    const res = await fetch(`${SERVER_DOMAIN}/api/user-orders/${storedId}`);
+                    const res = await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/user-orders/${storedId}`);
                     const data = await res.json();
 
                     if (res.ok) {
@@ -191,7 +191,7 @@ const ProductCheck = () => {
                                     <View key={product.order_item_id} style={styles.card}>
                                         <View style={styles.contentContainer}>
                                             <Image
-                                                source={{ uri: `${SERVER_DOMAIN}${product.image_url}` }}
+                                                source={{ uri: `${EXPO_PUBLIC_SERVER_DOMAIN}${product.image_url}` }}
                                                 // ✅ 웹에서도 정사각 비율 유지
                                                 style={[styles.image, { aspectRatio: 1 }]}
                                                 resizeMode="cover"
@@ -255,7 +255,7 @@ const ProductCheck = () => {
                             rating,        // 'b' | 'q'
                             comment,
                         };
-                        await axios.post(`${SERVER_DOMAIN}/api/feedback`, payload);
+                        await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/feedback`, payload);
                         // ✅ 제출 성공 시에도 해당 주문은 재노출 금지
                         await AsyncStorage.setItem(
                             `feedback_delivery_${deliveredOrderId}`,

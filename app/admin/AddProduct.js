@@ -17,7 +17,7 @@ import InputField from '../Components/InputField/InputField';
 import ColoredFullWidthButton from '../Components/Button/ColoredFullWidthButton';
 import BackButton from '../Components/Button/BackButton';
 import styles from '../Styles/AddProductStyle';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function AddProduct() {
     const router = useRouter();
@@ -67,7 +67,7 @@ export default function AddProduct() {
         });
 
         try {
-        const res = await fetch(`${SERVER_DOMAIN}/api/add-product-base64`, {
+        const res = await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/add-product-base64`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

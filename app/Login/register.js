@@ -7,7 +7,7 @@ import InputField from '../Components/InputField/InputField';
 import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle';
 import axios from 'axios';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -38,7 +38,7 @@ export default function Register() {
                     disabled={!isValid}
                     onPress={async () => {
                         try {
-                        await axios.post(`${SERVER_DOMAIN}/api/send-auth-code`, {
+                        await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/send-auth-code`, {
                             phone: phone.replace(/-/g, '') // 하이픈 제거
                         });
 

@@ -9,7 +9,7 @@ import DoubleButtonRowDisable from '../Components/Button/DoubleButtonRowDisable'
 import styles from '../Styles/ProductDetailStyle';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function ProductDetail() {
     const router = useRouter();
@@ -51,7 +51,7 @@ export default function ProductDetail() {
                 {/* 본문 */}
                 <ScrollView contentContainerStyle={[styles.contentContainer, { paddingBottom: 200 }]}>
                     <Image
-                        source={{ uri: `${SERVER_DOMAIN}${image_url}` }}
+                        source={{ uri: `${EXPO_PUBLIC_SERVER_DOMAIN}${image_url}` }}
                         style={styles.image}
                         resizeMode="cover" // ✅ 웹에서 이미지 찌부 방지
                     />
@@ -109,7 +109,7 @@ export default function ProductDetail() {
                                     product_id,
                                     name,
                                     price: Number(price),
-                                    image_url: `${SERVER_DOMAIN}${image_url}`,
+                                    image_url: `${EXPO_PUBLIC_SERVER_DOMAIN}${image_url}`,
                                     quantity,
                                     deliveryFee,
                                 };

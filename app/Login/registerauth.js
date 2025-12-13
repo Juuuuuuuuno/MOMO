@@ -7,7 +7,7 @@ import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle'; // 기존 registerStyle 재사용
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function RegisterAuth() {
     const [code, setCode] = useState('');
@@ -65,7 +65,7 @@ export default function RegisterAuth() {
             disabled={!isValid}
             onPress={async () => {
                 try {
-                const response = await axios.post(`${SERVER_DOMAIN}/api/verify-auth-code`, {
+                const response = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/verify-auth-code`, {
                     phone: phone, // 등록한 전화번호 (register.js에서 넘겨받는 구조 필요함)
                     code: code,
                 });
@@ -96,7 +96,7 @@ export default function RegisterAuth() {
                     text: '재전송',
                     onPress: async () => {
                         try {
-                        const res = await axios.post(`${SERVER_DOMAIN}/api/send-auth-code`, {
+                        const res = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/send-auth-code`, {
                             phone: phone.replace(/-/g, '')
                         });
                         if (res.data.success) {

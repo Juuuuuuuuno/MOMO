@@ -11,7 +11,7 @@ import axios from 'axios';
 import styles from '../Styles/SetStatusStyle'; // ✅ 상태관리와 동일 스타일 사용
 import BackButton from '../Components/Button/BackButton';
 import { useRouter } from 'expo-router';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function FeedbackList() {
     const router = useRouter();
@@ -31,7 +31,7 @@ export default function FeedbackList() {
             try {
                 // ⚠️ 서버에서 이 URL을 구현해야 함: /api/admin/feedback
                 const res = await axios.get(
-                    `${SERVER_DOMAIN}/api/admin/feedback`,
+                    `${EXPO_PUBLIC_SERVER_DOMAIN}/api/admin/feedback`,
                 );
 
                 // 예상 형태:

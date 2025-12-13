@@ -7,7 +7,7 @@ import DoubleButtonRow from '../Components/Button/DoubleButtonRow';
 import ColoredFullWidthButton from '../Components/Button/ColoredFullWidthButton';
 import styles from '../Styles/MainStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ 추가
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function AdminMainPage() {
     const router = useRouter();

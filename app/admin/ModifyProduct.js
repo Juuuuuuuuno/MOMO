@@ -7,7 +7,7 @@ import InputField from '../Components/InputField/InputField';
 import DoubleButtonRow from '../Components/Button/DoubleButtonRow';
 import BackButton from '../Components/Button/BackButton';
 import styles from '../Styles/AddProductStyle';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function ModifyProduct() {
     const router = useRouter();
@@ -15,7 +15,7 @@ export default function ModifyProduct() {
 
     const [productName, setProductName] = useState(name);
     const [productPrice, setProductPrice] = useState(price);
-    const [image, setImage] = useState(`${SERVER_DOMAIN}${image_url}`);
+    const [image, setImage] = useState(`${EXPO_PUBLIC_SERVER_DOMAIN}${image_url}`);
     const [base64Image, setBase64Image] = useState(null);
 
     const isFormValid = productName && productPrice;
@@ -53,7 +53,7 @@ export default function ModifyProduct() {
         };
 
         try {
-            const res = await fetch(`${SERVER_DOMAIN}/api/update-product`, {
+            const res = await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/update-product`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -75,7 +75,7 @@ export default function ModifyProduct() {
 
     const handleDelete = async () => {
         try {
-            const res = await fetch(`${SERVER_DOMAIN}/api/delete-product/${product_id}`, {
+            const res = await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/delete-product/${product_id}`, {
                 method: 'DELETE'
             });
 

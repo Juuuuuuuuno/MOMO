@@ -7,7 +7,7 @@ import styles from '../Styles/PayPageStyle';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 // ✅ 추가: 피드백 모달 & axios
 import FeedbackModal from '../Components/Feedback/FeedbackModal';
@@ -128,7 +128,7 @@ const PayPage = () => {
                             }
 
                             try {
-                                const res = await fetch(`${SERVER_DOMAIN}/api/orders`, {
+                                const res = await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/orders`, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
@@ -163,7 +163,7 @@ const PayPage = () => {
 
                                 if (res.ok) {
                                     // ✅ 문자 발송
-                                    await fetch(`${SERVER_DOMAIN}/api/send-payment-alert`, {
+                                    await fetch(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/send-payment-alert`, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({
@@ -267,7 +267,7 @@ const PayPage = () => {
                 rating,
                 comment,
                 };
-                await axios.post(`${SERVER_DOMAIN}/api/feedback`, payload);
+                await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/feedback`, payload);
             } catch (e) {
                 console.warn('피드백 저장 실패:', e?.response?.data || e.message);
             }

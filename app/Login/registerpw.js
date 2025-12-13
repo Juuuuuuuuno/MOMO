@@ -8,7 +8,7 @@ import FullWidthButton from '../Components/Button/FullWidthButton';
 import styles from '../Styles/RegisterStyle';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function RegisterPw() {
     const [password, setPassword] = useState('');
@@ -53,7 +53,7 @@ export default function RegisterPw() {
     disabled={!isValid}
     onPress={async () => {
         try {
-        const response = await axios.post(`${SERVER_DOMAIN}/api/register`, {
+        const response = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/register`, {
             name,
             phone,
             pw: password

@@ -20,7 +20,7 @@ import { useRouter } from 'expo-router';
 import styles from '../Styles/RegisterStyle';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
-import { SERVER_DOMAIN } from '@env';
+import { EXPO_PUBLIC_SERVER_DOMAIN } from '@env';
 
 export default function ChangePassword() {
     const [code, setCode] = useState('');
@@ -83,7 +83,7 @@ export default function ChangePassword() {
                     disabled={!isValid}
                     onPress={async () => {
                     try {
-                        const response = await axios.post(`${SERVER_DOMAIN}/api/reset-password`, {
+                        const response = await axios.post(`${EXPO_PUBLIC_SERVER_DOMAIN}/api/reset-password`, {
                         code,
                         newPw: password,
                         });

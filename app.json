@@ -34,7 +34,7 @@
     },
     "android": {
       "package": "com.juuuuuuno.MOMO",
-      "useCleartextTraffic":true  // HTTP 허용
-    }
+      "useCleartextTraffic":true 
   }
+}
 }
